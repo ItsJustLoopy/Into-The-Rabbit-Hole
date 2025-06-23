@@ -14,8 +14,9 @@ public partial class Tile
 	public Tile(int x, int y,TileManager tmanager)
 	{
 		TilePosition = new Vector2I(x, y);
-		GroundType = new GroundType();
 		TileManager = tmanager;
+		GroundType = new GroundType(this,"Grass");
+		tmanager.AddChild(GroundType);
 	}
 
 

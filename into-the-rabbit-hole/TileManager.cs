@@ -33,6 +33,7 @@ public partial class TileManager : Node
 		Player p = new Player(tile);
 		Move(p,tile);
 		AddChild(p);
+		
 
 	}
 
