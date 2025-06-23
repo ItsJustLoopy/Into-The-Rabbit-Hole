@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://dnsxwg47xpco1"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tjt5c"]
+width = 8
+height = 8
+
+[node name="PlayerComponents" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("NoiseTexture2D_tjt5c")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
