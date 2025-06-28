@@ -1,4 +1,5 @@
 ﻿using Godot;
+using IntoTheRabbitHole.TileManager;
 
 namespace IntoTheRabbitHole;
 
@@ -11,6 +12,7 @@ public partial class GroundType : Node2D
 	{
 		ParentTile = parentTile;
 		Position = ParentTile.TileManager.MapToLocal(ParentTile.TilePosition);
+		
 		var component = GD.Load<PackedScene>("res://Ground/"+gType+".tscn").Instantiate();
 		AddChild(component);
 	}

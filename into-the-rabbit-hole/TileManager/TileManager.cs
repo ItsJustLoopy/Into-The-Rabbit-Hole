@@ -1,15 +1,17 @@
 using Godot;
-using System;
-using System.Collections.Generic;
-using IntoTheRabbitHole;
+
+namespace IntoTheRabbitHole.TileManager;
 
 public partial class TileManager : Node
 {
 	private TileMapLayer _tileMap;
 	private Tile[,] _tiles;
 
+	public static TileManager Instance;
+
 	public override void _Ready()
 	{
+		Instance = this;
 		_tileMap = GetNode<TileMapLayer>("TileMapLayer");
 		if (_tileMap == null)
 		{
@@ -33,6 +35,30 @@ public partial class TileManager : Node
 		Player p = new Player(tile);
 		Move(p,tile);
 		AddChild(p);
+		
+		
+		//create some walls and traps
+		for (int i = 0; i < 10; i++)
+		{
+			var wallTile = GetTile(new Vector2I(i, 5));
+			if (wallTile != null)
+			{
+				var wall = new TileObject(wallTile, "Wall");
+				wallTile.Place(wall);
+				AddChild(wall);
+			}
+		}
+		
+		for (int i = 0; i < 10; i++)
+		{
+			var trapTile = GetTile(new Vector2I(i, 8));
+			if (trapTile != null)
+			{
+				var trap = new TileObject(trapTile, "Trap");
+				trapTile.Place(trap);
+				AddChild(trap);
+			}
+		}
 		
 
 	}
@@ -65,6 +91,8 @@ public partial class TileManager : Node
 		return _tileMap.MapToLocal(playerTilePosition);
 	}
 
+
+	
 	public void Move(TileObject o, Vector2I pos)
 	{
 		Move(o,GetTile(pos));
@@ -76,5 +104,23 @@ public partial class TileManager : Node
 			o.ParentTile.TileObjects.Remove(o);
 		}
 		target.Place(o);
+	}
+	
+	
+	private void QueueMove(TileObject o, Vector2I pos)
+	{
+		if (o.ParentTile != null)
+		{
+			o.ParentTile.TileObjects.Remove(o);
+		}
+		var target = GetTile(pos);
+		if (target != null)
+		{
+			target.Place(o);
+		}
+		else
+		{
+			GD.PrintErr("Target tile not found for position: " + pos);
+		}
 	}
 }

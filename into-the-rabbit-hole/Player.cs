@@ -1,15 +1,13 @@
-using Godot;
 using System;
-using IntoTheRabbitHole;
+using Godot;
+using IntoTheRabbitHole.TileManager;
+
+namespace IntoTheRabbitHole;
 
 public partial class Player : TileObject
 {
-	public Player(Tile parentTil): base(parentTil)
+	public Player(Tile parentTil): base(parentTil,"Player")
 	{
-		//attach playercomponents scene
-		var playerComponents = GD.Load<PackedScene>("res://PlayerComponents.tscn").Instantiate();
-		AddChild(playerComponents);
-			
 	}
 
 	public override void _Process(double delta)

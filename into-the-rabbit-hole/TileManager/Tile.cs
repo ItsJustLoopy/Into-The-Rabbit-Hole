@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Godot;
 
-namespace IntoTheRabbitHole;
+namespace IntoTheRabbitHole.TileManager;
 
 public partial class Tile
 {
@@ -18,13 +18,29 @@ public partial class Tile
 		GroundType = new GroundType(this,"Grass");
 		tmanager.AddChild(GroundType);
 	}
-
-
-
+	
 	public void Place(TileObject tileObject)
 	{
+		Vector2I fromDir = tileObject.TilePostion - TilePosition;
+		//normalise into simple directions
+		if (fromDir.X != 0)
+			fromDir.X = fromDir.X > 0 ? 1 : -1;
+		if (fromDir.Y != 0)
+			fromDir.Y = fromDir.Y > 0 ? 1 : -1;
+		
 		tileObject.ParentTile = this;
-		TileObjects.Add(tileObject);
 		tileObject.GlobalPosition = TileManager.MapToLocal(TilePosition);
+		
+		StepOn(tileObject,fromDir);
+		TileObjects.Add(tileObject);
+	}
+	
+	
+	public void StepOn(TileObject o, Vector2I fromDir)
+	{
+		foreach (var trait in TileObjects)
+		{
+			trait.StepOn(o,fromDir);
+		}
 	}
 }
