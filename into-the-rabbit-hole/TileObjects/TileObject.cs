@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using IntoTheRabbitHole;
-using IntoTheRabbitHole.TileManager;
+using IntoTheRabbitHole.Tiles;
 
 public partial class TileObject : Node2D
 {
@@ -12,6 +12,8 @@ public partial class TileObject : Node2D
 
 	public Vector2I TilePostion => ParentTile.TilePosition;
 	public TileManager TileManager => ParentTile.TileManager;
+
+
 	public TileObject(Tile parentTile, string type)
 	{
 		ParentTile = parentTile;
@@ -46,16 +48,28 @@ public partial class TileObject : Node2D
 	}
 	
 	
-	public void StepOn(TileObject o, Vector2I fromDir)
+	public void SteppedOn(TileObject o, Vector2I fromDir)
 	{
 		foreach (var trait in traits)
 		{
-			trait.StepOn(o, fromDir);
+			trait.SteppedOn(o, fromDir);
 		}
 	}
-	
-	
-	
-	
-	
+
+	public void TileEntered(Tile t)
+	{
+		foreach (var trait in traits)
+		{
+			trait.TileEntered(t);
+		}
+	}
+
+
+	public void Tick()
+	{
+		foreach (var trait in traits)
+		{
+			trait.Tick();
+		}
+	}
 }

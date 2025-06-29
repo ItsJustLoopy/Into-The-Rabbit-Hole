@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Godot;
 
-namespace IntoTheRabbitHole.TileManager;
+namespace IntoTheRabbitHole.Tiles;
 
 public partial class Tile
 {
@@ -31,16 +32,18 @@ public partial class Tile
 		tileObject.ParentTile = this;
 		tileObject.GlobalPosition = TileManager.MapToLocal(TilePosition);
 		
-		StepOn(tileObject,fromDir);
+		SteppedOn(tileObject,fromDir);
+		tileObject.TileEntered(this);
 		TileObjects.Add(tileObject);
 	}
 	
 	
-	public void StepOn(TileObject o, Vector2I fromDir)
+	public void SteppedOn(TileObject o, Vector2I fromDir)
 	{
-		foreach (var trait in TileObjects)
+		foreach (var to in TileObjects)
 		{
-			trait.StepOn(o,fromDir);
+			to.SteppedOn(o,fromDir);
 		}
 	}
+
 }

@@ -1,6 +1,7 @@
 ﻿using Godot;
+using IntoTheRabbitHole.Tiles;
 
-namespace IntoTheRabbitHole;
+namespace IntoTheRabbitHole.Traits;
 
 public class Trap : Trait
 {
@@ -8,15 +9,12 @@ public class Trap : Trait
 	{
 	}
 
-	public override ushort ExecutionPriority => 10;
+	public override ushort ExecutionPriority => 5;
 
-	public override void StepOn(TileObject o, Vector2I fromDir)
+	public override void SteppedOn(TileObject o, Vector2I fromDir)
 	{
 		o.Kill();
 	}
 
-	public override void LeapOver(TileObject o, Vector2I fromDir)
-	{
-		
-	}
+
 }

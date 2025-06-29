@@ -1,10 +1,11 @@
 ﻿using Godot;
+using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole;
 
 public abstract class Trait
 {
-	private TileObject _owner;
+	protected readonly TileObject _owner;
 	
 	public Trait(TileObject o)
 	{
@@ -13,8 +14,19 @@ public abstract class Trait
 	
 	public abstract ushort ExecutionPriority { get; }
 	//bigger number triggers after smaller number
-	
-	public abstract void StepOn(TileObject o, Vector2I fromDir);
-	public abstract void LeapOver(TileObject o, Vector2I fromDir);
 
+	public virtual void SteppedOn(TileObject o, Vector2I fromDir)
+	{
+		
+	}
+
+	public virtual void TileEntered(Tile t)
+	{
+		
+	}
+
+	public virtual void Tick()
+	{
+		
+	}
 }

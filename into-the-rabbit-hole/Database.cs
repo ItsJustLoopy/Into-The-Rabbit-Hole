@@ -26,16 +26,22 @@ public static class Database
 			Traits = new List<Type> { typeof(Trap) }
 		});
     
-	//	traits.Add("Wall", new ObjectType { 
-	//		Name = "Wall", 
-	//		Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Wall.png"),
-	//		Traits = new List<Type> { typeof(Solid) }
-	//	});
+		traits.Add("Wall", new ObjectType { 
+			Name = "Wall", 
+			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Wall.png"),
+			Traits = new List<Type> {  }
+		});
 		
 		traits.Add("Player", new ObjectType { 
 			Name = "Player", 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Player.png"),
 			Traits = new List<Type> { typeof(Camera) }
+		});
+		
+		traits.Add("Fox", new ObjectType { 
+			Name = "Fox", 
+			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Player.png"),
+			Traits = new List<Type> { typeof(FollowPlayer), typeof(Attack) }
 		});
 	}
 

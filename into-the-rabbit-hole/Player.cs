@@ -1,13 +1,16 @@
 using System;
 using Godot;
-using IntoTheRabbitHole.TileManager;
+using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole;
 
 public partial class Player : TileObject
 {
+
+	public static Player Instance;
 	public Player(Tile parentTil): base(parentTil,"Player")
 	{
+		Instance = this;
 	}
 
 	public override void _Process(double delta)

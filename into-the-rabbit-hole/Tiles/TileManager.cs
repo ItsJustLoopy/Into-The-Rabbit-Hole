@@ -1,6 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Godot;
 
-namespace IntoTheRabbitHole.TileManager;
+namespace IntoTheRabbitHole.Tiles;
 
 public partial class TileManager : Node
 {
@@ -59,10 +61,39 @@ public partial class TileManager : Node
 				AddChild(trap);
 			}
 		}
-		
+		//create fox
+		var t =  GetTile(new Vector2I(Random.Shared.Next(10),Random.Shared.Next(10)));
+		var fox = new TileObject(t, "Fox");
+		t.Place(fox);
+		AddChild(fox);
 
 	}
 
+
+	private double timeTillNextTick = 1;
+	private List<TileObject> GlobalList = new List<TileObject>();
+	public override void _Process(double delta)
+	{
+		timeTillNextTick -= delta;
+		if (timeTillNextTick <= 0)
+		{
+			GlobalList.Clear();
+			//we collect all objects and update them, "updating tiles" will cause moving objects to get ticked more than once
+			foreach (var t in _tiles)
+			{
+				GlobalList.AddRange(t.TileObjects);
+			}
+
+			foreach (var o in GlobalList)
+			{
+				o.Tick();
+			}
+
+			timeTillNextTick = 1;
+		}
+		base._Process(delta);
+		
+	}
 
 
 	private Tile GetTile(int x, int y)
@@ -105,22 +136,5 @@ public partial class TileManager : Node
 		}
 		target.Place(o);
 	}
-	
-	
-	private void QueueMove(TileObject o, Vector2I pos)
-	{
-		if (o.ParentTile != null)
-		{
-			o.ParentTile.TileObjects.Remove(o);
-		}
-		var target = GetTile(pos);
-		if (target != null)
-		{
-			target.Place(o);
-		}
-		else
-		{
-			GD.PrintErr("Target tile not found for position: " + pos);
-		}
-	}
+
 }

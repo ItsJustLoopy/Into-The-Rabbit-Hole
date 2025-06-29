@@ -1,5 +1,5 @@
 ﻿using Godot;
-using IntoTheRabbitHole.TileManager;
+using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole;
 
