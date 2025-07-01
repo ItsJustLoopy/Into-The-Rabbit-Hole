@@ -44,25 +44,15 @@ public partial class Player : TileObject
 		//only allow up left, down right movement of 1 unit
 		if (Math.Abs(direction.X) + Math.Abs(direction.Y) > 1)
 			return;
-		var intermediatePosition = TilePostion + direction;
-		var newPosition = TilePostion + direction*2;
-
-		Tile ti = TileManager.GetTile(intermediatePosition);
-		Tile tn = TileManager.GetTile(newPosition);
-
 
 		
-		if(ti.GroundType.canStand)
-		{
-			TileManager.Move(this,intermediatePosition);
-			if (tn.GroundType.canStand)
-			{
-				TileManager.Move(this,newPosition);
-			}
-		}
-		else
-		{
-			GD.Print("Cannot move to that tile!");
-		}
+		var posToMOve = TilePostion + direction;
+		TileManager.Instance.Jump(this,posToMOve);
+		
+		posToMOve = TilePostion + direction;
+		TileManager.Instance.Move(this,posToMOve);
+
+
+
 	}
 }

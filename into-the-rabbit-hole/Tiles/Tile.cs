@@ -8,7 +8,6 @@ public partial class Tile
 {
 	public List<TileObject> TileObjects = new List<TileObject>();
 	public GroundType GroundType;
-	public bool CanStandOn => GroundType?.canStand ?? true && TileObjects.TrueForAll(obj => !obj.Solid);
 	public Vector2I TilePosition;
 	public readonly TileManager TileManager;
 
@@ -20,7 +19,7 @@ public partial class Tile
 		tmanager.AddChild(GroundType);
 	}
 	
-	public void Place(TileObject tileObject)
+	public void Place(TileObject tileObject, bool floating = false)
 	{
 		Vector2I fromDir = tileObject.TilePostion - TilePosition;
 		//normalise into simple directions
@@ -31,13 +30,29 @@ public partial class Tile
 		
 		tileObject.ParentTile = this;
 		tileObject.GlobalPosition = TileManager.MapToLocal(TilePosition);
+
+		if (floating)
+		{
+			FloatedOn(tileObject,fromDir);
+		}
+		else
+		{
+			SteppedOn(tileObject,fromDir);
+		}
 		
-		SteppedOn(tileObject,fromDir);
 		tileObject.TileEntered(this);
 		TileObjects.Add(tileObject);
 	}
-	
-	
+
+	private void FloatedOn(TileObject tileObject, Vector2I fromDir)
+	{
+		foreach (var to in TileObjects)
+		{
+			to.FloatedOn(tileObject,fromDir);
+		}
+	}
+
+
 	public void SteppedOn(TileObject o, Vector2I fromDir)
 	{
 		foreach (var to in TileObjects)

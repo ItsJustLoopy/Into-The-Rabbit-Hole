@@ -36,36 +36,29 @@ public partial class TileManager : Node
 		var tile = GetTile(0, 0);
 		Player p = new Player(tile);
 		Move(p,tile);
-		AddChild(p);
 		
 		
-		//create some walls and traps
-		for (int i = 0; i < 10; i++)
-		{
-			var wallTile = GetTile(new Vector2I(i, 5));
-			if (wallTile != null)
-			{
-				var wall = new TileObject(wallTile, "Wall");
-				wallTile.Place(wall);
-				AddChild(wall);
-			}
-		}
-		
-		for (int i = 0; i < 10; i++)
+
+		for (int i = 0; i < 15; i+=3)
 		{
 			var trapTile = GetTile(new Vector2I(i, 8));
 			if (trapTile != null)
 			{
 				var trap = new TileObject(trapTile, "Trap");
 				trapTile.Place(trap);
-				AddChild(trap);
 			}
 		}
-		//create fox
-		var t =  GetTile(new Vector2I(Random.Shared.Next(10),Random.Shared.Next(10)));
-		var fox = new TileObject(t, "Fox");
-		t.Place(fox);
-		AddChild(fox);
+		
+		for (int i = 0; i < 15; i+=3)
+		{
+			var trapTile = GetTile(new Vector2I(i, 12));
+			if (trapTile != null)
+			{
+				var trap = new TileObject(trapTile, "JumpTrap");
+				trapTile.Place(trap);
+			}
+		}
+
 
 	}
 
@@ -137,4 +130,17 @@ public partial class TileManager : Node
 		target.Place(o);
 	}
 
+	public void Jump(TileObject o, Vector2I pos)
+	{
+		Jump(o,GetTile(pos));
+	}
+	
+	private void Jump(TileObject o, Tile target)
+	{
+		if (o.ParentTile != null)
+		{
+			o.ParentTile.TileObjects.Remove(o);
+		}
+		target.Place(o,true);
+	}
 }

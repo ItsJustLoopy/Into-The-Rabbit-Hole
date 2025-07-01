@@ -19,6 +19,10 @@ public abstract class Trait
 	{
 		
 	}
+	public virtual void FloatedOn(TileObject o, Vector2I fromDir)
+	{
+		
+	}
 
 	public virtual void TileEntered(Tile t)
 	{
@@ -29,4 +33,6 @@ public abstract class Trait
 	{
 		
 	}
+
+	
 }

@@ -25,6 +25,12 @@ public static class Database
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
 			Traits = new List<Type> { typeof(Trap) }
 		});
+		
+		traits.Add("JumpTrap", new ObjectType { 
+			Name = "JumpTrap", 
+			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
+			Traits = new List<Type> { typeof(JumpTrap) }
+		});
     
 		traits.Add("Wall", new ObjectType { 
 			Name = "Wall", 

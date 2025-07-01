@@ -9,10 +9,7 @@ public partial class TileObject : Node2D
 	public Tile ParentTile = null;
 	public bool Solid = false;
 	private List<Trait> traits = new List<Trait>();
-
 	public Vector2I TilePostion => ParentTile.TilePosition;
-	public TileManager TileManager => ParentTile.TileManager;
-
 
 	public TileObject(Tile parentTile, string type)
 	{
@@ -28,7 +25,7 @@ public partial class TileObject : Node2D
 		Sprite2D sprite = new Sprite2D();
 		sprite.Texture = objDef.Texture;
 		AddChild(sprite);
-		
+		TileManager.Instance.AddChild(this);
 		
 	}
 
@@ -70,6 +67,14 @@ public partial class TileObject : Node2D
 		foreach (var trait in traits)
 		{
 			trait.Tick();
+		}
+	}
+
+	public void FloatedOn(TileObject tileObject, Vector2I fromDir)
+	{
+		foreach (var trait in traits)
+		{
+			trait.FloatedOn(tileObject,fromDir);
 		}
 	}
 }
