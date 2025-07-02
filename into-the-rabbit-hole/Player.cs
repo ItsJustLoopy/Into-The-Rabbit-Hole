@@ -13,6 +13,8 @@ public partial class Player : TileObject
 		Instance = this;
 	}
 
+	public int Score { get; set; }
+
 	public override void _Process(double delta)
 	{
 

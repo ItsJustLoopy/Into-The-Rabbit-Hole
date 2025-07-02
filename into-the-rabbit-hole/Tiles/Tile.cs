@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Godot;
+using IntoTheRabbitHole.Traits;
 
 namespace IntoTheRabbitHole.Tiles;
 
@@ -19,6 +20,7 @@ public partial class Tile
 		tmanager.AddChild(GroundType);
 	}
 	
+	//floating bool is a special case for the player jumping over
 	public void Place(TileObject tileObject, bool floating = false)
 	{
 		Vector2I fromDir = tileObject.TilePostion - TilePosition;
@@ -31,7 +33,7 @@ public partial class Tile
 		tileObject.ParentTile = this;
 		tileObject.GlobalPosition = TileManager.MapToLocal(TilePosition);
 
-		if (floating)
+		if (floating || tileObject.HasTrait<Float>())
 		{
 			FloatedOn(tileObject,fromDir);
 		}
@@ -44,20 +46,37 @@ public partial class Tile
 		TileObjects.Add(tileObject);
 	}
 
+	private List<TileObject> SafeList = new List<TileObject>();
+	private List<TileObject> GetSafeList()
+	{
+		SafeList.Clear();
+		SafeList.AddRange(TileObjects);
+		return SafeList;
+	}
 	private void FloatedOn(TileObject tileObject, Vector2I fromDir)
 	{
-		foreach (var to in TileObjects)
+		foreach (var to in GetSafeList())
 		{
 			to.FloatedOn(tileObject,fromDir);
+			
+			//if we move into another floating object we "step" on it
+			if (to.HasTrait<Float>())
+			{
+				to.SteppedOn(tileObject,fromDir);
+			}
 		}
 	}
 
 
 	public void SteppedOn(TileObject o, Vector2I fromDir)
 	{
-		foreach (var to in TileObjects)
+		foreach (var to in GetSafeList())
 		{
 			to.SteppedOn(o,fromDir);
+			if (to.HasTrait<Float>())
+			{
+				to.SteppedUnder(o,fromDir);
+			}
 		}
 	}
 

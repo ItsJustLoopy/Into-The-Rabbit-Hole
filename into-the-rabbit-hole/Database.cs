@@ -11,7 +11,6 @@ public static class Database
 
 	public struct ObjectType
 	{
-		public string Name;
 		public Texture2D Texture;
 		public List<Type> Traits;
 	}
@@ -21,33 +20,45 @@ public static class Database
 	static Database()
 	{
 		traits.Add("Trap", new ObjectType { 
-			Name = "Trap", 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
 			Traits = new List<Type> { typeof(Trap) }
 		});
 		
 		traits.Add("JumpTrap", new ObjectType { 
-			Name = "JumpTrap", 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
-			Traits = new List<Type> { typeof(JumpTrap) }
+			Traits = new List<Type> { typeof(Grabber) }
 		});
+		
+		traits.Add("FloatingTrap", new ObjectType { 
+			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
+			Traits = new List<Type> { typeof(Float),typeof(Trap) }
+		});
+		
+
+		//tuah
+		traits.Add("Hawk", new ObjectType { 
+			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
+			Traits = new List<Type> { typeof(Grabber), typeof(Float) }
+		});
+
     
 		traits.Add("Wall", new ObjectType { 
-			Name = "Wall", 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Wall.png"),
 			Traits = new List<Type> {  }
 		});
 		
 		traits.Add("Player", new ObjectType { 
-			Name = "Player", 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Player.png"),
-			Traits = new List<Type> { typeof(Camera) }
+			Traits = new List<Type> { typeof(Camera),typeof(Float) }
 		});
 		
 		traits.Add("Fox", new ObjectType { 
-			Name = "Fox", 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Player.png"),
 			Traits = new List<Type> { typeof(FollowPlayer), typeof(Attack) }
+		});
+		traits.Add("Carrot", new ObjectType { 
+			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Carrot.png"),
+			Traits = new List<Type> { typeof(Collectible) }
 		});
 	}
 

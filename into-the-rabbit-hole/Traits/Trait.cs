@@ -12,6 +12,12 @@ public abstract class Trait
 		_owner = o;
 	}
 	
+	public virtual void ModifyAppearance(double deltaTime)
+	{
+		// Default implementation does nothing
+	}
+
+	
 	public abstract ushort ExecutionPriority { get; }
 	//bigger number triggers after smaller number
 
@@ -34,5 +40,9 @@ public abstract class Trait
 		
 	}
 
-	
+
+	public virtual void SteppedUnder(TileObject tileObject, Vector2I fromDir)
+	{
+		
+	}
 }

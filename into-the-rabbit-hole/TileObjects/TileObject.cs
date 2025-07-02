@@ -14,19 +14,47 @@ public partial class TileObject : Node2D
 	public TileObject(Tile parentTile, string type)
 	{
 		ParentTile = parentTile;
-		
 		var objDef = Database.GetObjectType(type);
+		
+		
+		Sprite2D sprite = new Sprite2D();
+		sprite.Texture = objDef.Texture;
+		sprite.Name = "Sprite2D";
+		AddChild(sprite);
+		
+		
+		
 		foreach (var t in objDef.Traits)
 		{
 			traits.Add((Trait)Activator.CreateInstance(t, this));
 		}
 		//sort by execution order
 		traits.Sort(((traitA, traitB) => traitA.ExecutionPriority.CompareTo(traitB.ExecutionPriority)));
-		Sprite2D sprite = new Sprite2D();
-		sprite.Texture = objDef.Texture;
-		AddChild(sprite);
+
 		TileManager.Instance.AddChild(this);
 		
+	}
+
+
+	public override void _Process(double delta)
+	{
+		base._Process(delta);
+		foreach (var t in traits)
+		{
+			t.ModifyAppearance(delta);
+		}
+	}
+
+	public bool HasTrait<T>() where T : Trait
+	{
+		foreach (var trait in traits)
+		{
+			if (trait is T)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -75,6 +103,14 @@ public partial class TileObject : Node2D
 		foreach (var trait in traits)
 		{
 			trait.FloatedOn(tileObject,fromDir);
+		}
+	}
+
+	public void SteppedUnder(TileObject tileObject, Vector2I fromDir)
+	{
+		foreach (var trait in traits)
+		{
+			trait.SteppedUnder(tileObject,fromDir);
 		}
 	}
 }

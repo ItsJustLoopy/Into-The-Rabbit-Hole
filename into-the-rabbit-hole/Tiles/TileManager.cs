@@ -58,6 +58,18 @@ public partial class TileManager : Node
 				trapTile.Place(trap);
 			}
 		}
+		
+		//make some collectibles
+		
+		for (int i = 0; i < 15; i+=3)
+		{
+			var collectTile = GetTile(new Vector2I(i, 4));
+			if (collectTile != null)
+			{
+				var collect = new TileObject(collectTile, "Carrot");
+				collectTile.Place(collect);
+			}
+		}
 
 
 	}
