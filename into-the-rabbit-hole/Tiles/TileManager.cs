@@ -77,19 +77,26 @@ public partial class TileManager : Node
 
 	private double timeTillNextTick = 1;
 	private List<TileObject> GlobalList = new List<TileObject>();
+	
+	private List<TileObject> GetGlobalList()
+	{
+		GlobalList.Clear();
+		//we collect all objects and update them, "updating tiles" will cause moving objects to get ticked more than once
+		foreach (var t in _tiles)
+		{
+			GlobalList.AddRange(t.TileObjects);
+		}
+		return GlobalList;
+	}
 	public override void _Process(double delta)
 	{
 		timeTillNextTick -= delta;
 		if (timeTillNextTick <= 0)
 		{
-			GlobalList.Clear();
-			//we collect all objects and update them, "updating tiles" will cause moving objects to get ticked more than once
-			foreach (var t in _tiles)
-			{
-				GlobalList.AddRange(t.TileObjects);
-			}
+			
+		
 
-			foreach (var o in GlobalList)
+			foreach (var o in GetGlobalList())
 			{
 				o.Tick();
 			}
@@ -154,5 +161,13 @@ public partial class TileManager : Node
 			o.ParentTile.TileObjects.Remove(o);
 		}
 		target.Place(o,true);
+	}
+
+	public void UpdateCameraPosition(float camRotation)
+	{
+		foreach (var obj in GetGlobalList())
+		{
+			obj.UpdateCameraPosition(camRotation);
+		}
 	}
 }

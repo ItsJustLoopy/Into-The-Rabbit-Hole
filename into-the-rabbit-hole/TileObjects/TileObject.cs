@@ -10,14 +10,14 @@ public partial class TileObject : Node2D
 	public bool Solid = false;
 	private List<Trait> traits = new List<Trait>();
 	public Vector2I TilePostion => ParentTile.TilePosition;
+	Sprite2D sprite = null;//coca cola acxaxasxxcdxdxdxdxd
 
 	public TileObject(Tile parentTile, string type)
 	{
 		ParentTile = parentTile;
 		var objDef = Database.GetObjectType(type);
 		
-		
-		Sprite2D sprite = new Sprite2D();
+		sprite = new Sprite2D();
 		sprite.Texture = objDef.Texture;
 		sprite.Name = "Sprite2D";
 		AddChild(sprite);
@@ -111,6 +111,19 @@ public partial class TileObject : Node2D
 		foreach (var trait in traits)
 		{
 			trait.SteppedUnder(tileObject,fromDir);
+		}
+	}
+
+	public void UpdateCameraPosition(float camRotation)
+	{
+		//roatate sprites to stay upright
+		if (sprite != null)
+		{
+			sprite.Rotation = camRotation;
+		}
+		else
+		{
+			GD.PrintErr("TileObject has no sprite to update camera position.");
 		}
 	}
 }
