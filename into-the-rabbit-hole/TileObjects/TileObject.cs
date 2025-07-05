@@ -10,14 +10,14 @@ public partial class TileObject : Node2D
 	public bool Solid = false;
 	private List<Trait> traits = new List<Trait>();
 	public Vector2I TilePostion => ParentTile.TilePosition;
-	Sprite2D sprite = null;//coca cola acxaxasxxcdxdxdxdxd
+	Sprite2D sprite = new Sprite2D();
 
 	public TileObject(Tile parentTile, string type)
 	{
 		ParentTile = parentTile;
+
 		var objDef = Database.GetObjectType(type);
-		
-		sprite = new Sprite2D();
+
 		sprite.Texture = objDef.Texture;
 		sprite.Name = "Sprite2D";
 		AddChild(sprite);
@@ -32,7 +32,7 @@ public partial class TileObject : Node2D
 		traits.Sort(((traitA, traitB) => traitA.ExecutionPriority.CompareTo(traitB.ExecutionPriority)));
 
 		TileManager.Instance.AddChild(this);
-		
+		ParentTile.Place(this);
 	}
 
 

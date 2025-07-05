@@ -44,8 +44,8 @@ public partial class TileManager : Node
 			var trapTile = GetTile(new Vector2I(i, 8));
 			if (trapTile != null)
 			{
-				var trap = new TileObject(trapTile, "Trap");
-				trapTile.Place(trap);
+				new TileObject(trapTile, "Trap");
+
 			}
 		}
 		
@@ -54,8 +54,7 @@ public partial class TileManager : Node
 			var trapTile = GetTile(new Vector2I(i, 12));
 			if (trapTile != null)
 			{
-				var trap = new TileObject(trapTile, "JumpTrap");
-				trapTile.Place(trap);
+				new TileObject(trapTile, "JumpTrap");
 			}
 		}
 		
@@ -66,11 +65,17 @@ public partial class TileManager : Node
 			var collectTile = GetTile(new Vector2I(i, 4));
 			if (collectTile != null)
 			{
-				var collect = new TileObject(collectTile, "Carrot");
-				collectTile.Place(collect);
+				new TileObject(collectTile, "Carrot");
+
 			}
 		}
 
+		var randomTile = GetTile(new Vector2I(GD.RandRange(-5,5), GD.RandRange(-5,5)));
+		new TileObject(randomTile,"Hawk");
+		randomTile = GetTile(new Vector2I(GD.RandRange(-5,5), GD.RandRange(-5,5)));
+		new TileObject(randomTile,"Hawk");
+		randomTile = GetTile(new Vector2I(GD.RandRange(-5,5), GD.RandRange(-5,5)));
+		new TileObject(randomTile,"Hawk");
 
 	}
 

@@ -37,8 +37,8 @@ public static class Database
 
 		//tuah
 		traits.Add("Hawk", new ObjectType { 
-			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
-			Traits = new List<Type> { typeof(Grabber), typeof(Float) }
+			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Hawk.png"),
+			Traits = new List<Type> { typeof(Grabber), typeof(Float),typeof(Walk) }
 		});
 
     
@@ -49,7 +49,7 @@ public static class Database
 		
 		traits.Add("Player", new ObjectType { 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Player.png"),
-			Traits = new List<Type> {typeof(Float) }
+			Traits = new List<Type> { typeof(Camo)}
 		});
 		
 		traits.Add("Fox", new ObjectType { 
