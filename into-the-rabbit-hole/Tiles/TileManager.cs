@@ -67,7 +67,8 @@ public partial class TileManager : Node
 		}
 
 		
-
+		InitializeTiles(100,100);
+		
 		//Initialize level generator
 		_levelGenerator.Initialize();
 		_levelGenerator.GenerateLevel();
