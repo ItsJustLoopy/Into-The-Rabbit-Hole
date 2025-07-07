@@ -8,6 +8,7 @@ namespace IntoTheRabbitHole;
 public static class Database
 {
 	static Dictionary<string, ObjectType> traits = new Dictionary<string, ObjectType>();
+	static Dictionary<int, Level> levels = new Dictionary<int, Level>();
 
 	public struct ObjectType
 	{
@@ -15,10 +16,17 @@ public static class Database
 		public List<Type> Traits;
 	}
 
+	public struct Level
+	{
+		public List<string> GroundTypes;
+		public Dictionary<string,int> TileObjects;
+	}
+
 	
 
 	static Database()
 	{
+		//Traits
 		traits.Add("Trap", new ObjectType { 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
 			Traits = new List<Type> { typeof(Trap) }
@@ -35,7 +43,7 @@ public static class Database
 		});
 		
 
-		//tuah
+		//tuah 
 		traits.Add("Hawk", new ObjectType { 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Trap.png"),
 			Traits = new List<Type> { typeof(Grabber), typeof(Float) }
@@ -60,6 +68,18 @@ public static class Database
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Carrot.png"),
 			Traits = new List<Type> { typeof(Collectible) }
 		});
+		
+		//Levels
+		levels.Add(1, new Level
+		{
+			GroundTypes = ["Grass", "Water"],
+			TileObjects = new Dictionary<string, int>
+			{
+				{"Trap", 10},
+				{"Carrot", 15}
+			}
+		});
+
 	}
 
 	
@@ -72,5 +92,10 @@ public static class Database
 			return new ObjectType();
 		}
 		return traits[type];
+	}
+
+	public static Level GetLevel(int num)
+	{
+		return levels[num];
 	}
 }

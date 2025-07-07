@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace IntoTheRabbitHole.Tiles;
@@ -7,69 +8,84 @@ namespace IntoTheRabbitHole.Tiles;
 public partial class TileManager : Node
 {
 	private TileMapLayer _tileMap;
+	
 	private Tile[,] _tiles;
+	public Tile[,] Tiles => _tiles;
+	public int CurrentLevel { get; private set; } = 1;
 
-	public static TileManager Instance;
+	
+	private static TileManager _instance;
+	public static TileManager Instance
+	{
+		get => _instance;
+		private set => _instance = value;
+	}
+	
+	[Export] LevelGenerator _levelGenerator;
 
+	public void InitializeTiles(int width, int height)
+	{
+		_tiles = new Tile[width, height];
+
+		for (int x = 0; x < width; x++)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				
+				_tiles[x, y] = new Tile(x - 50, y - 50, this);
+			}
+		}
+	}
+
+	
+
+
+
+	
 	public override void _Ready()
 	{
+		//Null check maxxing
+		if (Instance != null)
+		{
+			GD.PrintErr("Infinitwe pringles detected!");
+			QueueFree();
+			return;
+		}
 		Instance = this;
+		
 		_tileMap = GetNode<TileMapLayer>("TileMapLayer");
 		if (_tileMap == null)
 		{
 			GD.PrintErr("TileMapLayer node not found in TileManager.");
 			return;
 		}
-
-		// Initialize or load tiles here if needed
-		_tiles = new Tile[100, 100];
 		
-		// Populate the tile array with Tile objects
-		for (int x = 0; x < _tiles.GetLength(0); x++)
+		if (_levelGenerator == null)
 		{
-			for (int y = 0; y < _tiles.GetLength(1); y++)
-			{
-				_tiles[x, y] = new Tile(x - 50, y - 50, this); // Adjusting for center origin
-			}
+			GD.PrintErr("LevelGenerator not assigned in TileManager  - godot exported property.");
+			return;
 		}
 
-		var tile = GetTile(0, 0);
-		Player p = new Player(tile);
-		Move(p,tile);
-		
 		
 
-		for (int i = 0; i < 15; i+=3)
+		//Initialize level generator
+		_levelGenerator.Initialize();
+		_levelGenerator.GenerateLevel();
+
+		// Create baba
+		var origin = GetTile(0, 0);
+		if (origin != null)
 		{
-			var trapTile = GetTile(new Vector2I(i, 8));
-			if (trapTile != null)
-			{
-				var trap = new TileObject(trapTile, "Trap");
-				trapTile.Place(trap);
-			}
+			Player p = new Player(origin);
+			Move(p, origin);
 		}
-		
-		for (int i = 0; i < 15; i+=3)
+		else
 		{
-			var trapTile = GetTile(new Vector2I(i, 12));
-			if (trapTile != null)
-			{
-				var trap = new TileObject(trapTile, "JumpTrap");
-				trapTile.Place(trap);
-			}
+			GD.PrintErr("Could not get origin for player placement");
 		}
+
 		
-		//make some collectibles
-		
-		for (int i = 0; i < 15; i+=3)
-		{
-			var collectTile = GetTile(new Vector2I(i, 4));
-			if (collectTile != null)
-			{
-				var collect = new TileObject(collectTile, "Carrot");
-				collectTile.Place(collect);
-			}
-		}
+
 
 
 	}
@@ -84,7 +100,11 @@ public partial class TileManager : Node
 		//we collect all objects and update them, "updating tiles" will cause moving objects to get ticked more than once
 		foreach (var t in _tiles)
 		{
-			GlobalList.AddRange(t.TileObjects);
+			if (t != null)
+			{
+				GlobalList.AddRange(t.TileObjects ?? Enumerable.Empty<TileObject>());
+			}
+
 		}
 		return GlobalList;
 	}
@@ -94,8 +114,8 @@ public partial class TileManager : Node
 		if (timeTillNextTick <= 0)
 		{
 			
-		
-
+			
+			
 			foreach (var o in GetGlobalList())
 			{
 				o.Tick();
@@ -126,6 +146,16 @@ public partial class TileManager : Node
 		}
 
 		return _tiles[x, y];
+	}
+	
+	public void SetTile(int x, int y, Tile tile)
+	{
+		if (x < 0 || y < 0 || x >= _tiles.GetLength(0) || y >= _tiles.GetLength(1))
+		{
+			GD.PrintErr($"Attempted to set tile outside bounds at {x},{y}");
+			return;
+		}
+		_tiles[x, y] = tile;
 	}
 
 
@@ -170,4 +200,9 @@ public partial class TileManager : Node
 			obj.UpdateCameraPosition(camRotation);
 		}
 	}
+	
+
+	
+	
+
 }
