@@ -119,7 +119,7 @@ public partial class TileObject : Node2D
 		//roatate sprites to stay upright
 		if (sprite != null)
 		{
-			sprite.Rotation = camRotation;
+			sprite.Rotation = camRotation; //OBJECT IS KILL WHY STILL TRACKED?
 		}
 		else
 		{
