@@ -95,12 +95,8 @@ public partial class Player : TileObject
 		if (Math.Abs(direction.X) + Math.Abs(direction.Y) > 1)
 			return;
 
-		
-		var posToMOve = TilePostion + direction;
-		TileManager.Instance.Jump(this,posToMOve);
-		
-		posToMOve = TilePostion + direction;
-		TileManager.Instance.Move(this,posToMOve);
+		TileManager.Instance.PlayerMove(this,direction);
+
 
 
 	}

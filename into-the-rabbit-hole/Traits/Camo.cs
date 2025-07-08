@@ -10,7 +10,6 @@ public class Camo : Trait
 	public Camo(TileObject o) : base(o)
 	{
 		ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
-`
 	}
 
 

@@ -60,16 +60,12 @@ public partial class TileObject : Node2D
 
 	public void Kill()
 	{
-		if (ParentTile != null)
+		TileManager.Instance.DoAfterThisTick(new Action(() =>
 		{
 			ParentTile.TileObjects.Remove(this);
-			ParentTile = null;
-		}
-		else
-		{
-			GD.PrintErr("TileObject has no parent tile to remove from.");
-		}
-		QueueFree();
+			QueueFree();
+		}));
+	
 	}
 	
 	

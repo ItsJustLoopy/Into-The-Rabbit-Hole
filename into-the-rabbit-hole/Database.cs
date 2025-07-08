@@ -49,7 +49,7 @@ public static class Database
 		
 		traits.Add("Player", new ObjectType { 
 			Texture = GD.Load<Texture2D>("res://Assets/Textures/TileObjects/Player.png"),
-			Traits = new List<Type> { typeof(Camo)}
+			Traits = new List<Type> {}
 		});
 		
 		traits.Add("Fox", new ObjectType { 
