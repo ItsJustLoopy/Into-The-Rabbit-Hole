@@ -1,5 +1,4 @@
-﻿using Godot;
-using IntoTheRabbitHole.Tiles;
+﻿using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole.Traits;
 
@@ -16,7 +15,7 @@ public class Attack : Trait
 	{
 		foreach (var o in t.TileObjects)
 		{
-		//	o.Kill();
+			//	o.Kill();
 		}
 	}
 }

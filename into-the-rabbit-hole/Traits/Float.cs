@@ -5,9 +5,6 @@ namespace IntoTheRabbitHole.Traits;
 
 public class Float : Trait
 {
-
-
-
 	public Float(TileObject o) : base(o)
 	{
 	}
@@ -18,15 +15,12 @@ public class Float : Trait
 	{
 		base.TileEntered(t);
 	}
-	
+
 	public override void ModifyAppearance(double delta)
 	{
-
-
-		float posOffset = (float) Mathf.Sin(Time.GetTicksMsec()*0.005)*0.1f;
+		float posOffset = (float) Mathf.Sin(Time.GetTicksMsec() * 0.005) * 0.1f;
 
 		// Apply the offset to the object's position
-		_owner.Position = _owner.Position with {Y = _owner.Position.Y - posOffset};
+		Owner.Position = Owner.Position with {Y = Owner.Position.Y - posOffset};
 	}
-
 }

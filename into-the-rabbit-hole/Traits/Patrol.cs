@@ -5,6 +5,7 @@ namespace IntoTheRabbitHole.Traits;
 
 public class Patrol : Trait
 {
+	private readonly int _dirInt = GD.RandRange(0, 3);
 
 	public Patrol(TileObject o) : base(o)
 	{
@@ -13,12 +14,10 @@ public class Patrol : Trait
 
 	public override ushort ExecutionPriority => 5;
 
-	int dirInt = GD.RandRange(0, 3);
 	public override void Tick()
 	{
-
-		Vector2I dir = Vector2I.Zero;
-		switch (dirInt)
+		var dir = Vector2I.Zero;
+		switch (_dirInt)
 		{
 			case 0:
 				dir = Vector2I.Up;
@@ -33,7 +32,8 @@ public class Patrol : Trait
 				dir = Vector2I.Right;
 				break;
 		}
-		TileManager.Instance.Move(_owner,_owner.TilePostion + dir);
+
+		TileManager.Instance.Move(Owner, Owner.TilePostion + dir);
 		//TODO CHEC IF WE BOUNCE OF WALL, CHANGE DIRECTION THEN
 	}
 }

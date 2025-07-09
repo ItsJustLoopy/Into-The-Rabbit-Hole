@@ -5,7 +5,6 @@ namespace IntoTheRabbitHole.Traits;
 
 public class Walk : Trait
 {
-
 	public Walk(TileObject o) : base(o)
 	{
 	}
@@ -16,7 +15,7 @@ public class Walk : Trait
 	public override void Tick()
 	{
 		int dirInt = GD.RandRange(0, 3);
-		Vector2I dir = Vector2I.Zero;
+		var dir = Vector2I.Zero;
 		switch (dirInt)
 		{
 			case 0:
@@ -32,6 +31,7 @@ public class Walk : Trait
 				dir = Vector2I.Right;
 				break;
 		}
-		TileManager.Instance.Move(_owner,_owner.TilePostion + dir);
+
+		TileManager.Instance.Move(Owner, Owner.TilePostion + dir);
 	}
 }

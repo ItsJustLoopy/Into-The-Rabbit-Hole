@@ -15,6 +15,4 @@ public class Solid : Trait
 	{
 		TileManager.Instance.Move(o, o.TilePostion + fromDir);
 	}
-
-
 }

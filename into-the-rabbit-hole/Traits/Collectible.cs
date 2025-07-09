@@ -12,17 +12,17 @@ public class Collectible : Trait
 
 	public override void SteppedOn(TileObject o, Vector2I fromDir)
 	{
-		Player player = o as Player;
+		var player = o as Player;
 		if (player != null)
 		{
 			//this is the player
 			player.Score++;
 			GD.Print("player collected a collectible! Score: " + player.Score);
 		}
-		
+
 		//everything picks up the collectible
-		_owner.Kill();
-		
+		Owner.Kill();
+
 		base.SteppedOn(o, fromDir);
 	}
 }

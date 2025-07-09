@@ -1,69 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Godot;
 using IntoTheRabbitHole.Traits;
 
 namespace IntoTheRabbitHole.Tiles;
 
-public partial class Tile
+public class Tile
 {
-	public List<TileObject> TileObjects = new List<TileObject>();
-	public GroundType GroundType;
-	public Vector2I TilePosition;
 	public readonly TileManager TileManager;
+	public GroundType GroundType;
 
-	public Tile(int x, int y,TileManager tmanager)
+	private readonly List<TileObject> _safeList = new();
+	public List<TileObject> TileObjects = new();
+	public Vector2I TilePosition;
+
+	public Tile(int x, int y, TileManager tmanager)
 	{
 		TilePosition = new Vector2I(x, y);
 		TileManager = tmanager;
-		GroundType = new GroundType(this,"Grass");
+		GroundType = new GroundType(this, "Grass");
 		tmanager.AddChild(GroundType);
 	}
-	
+
 	//floating bool is a special case for the player jumping over
 	public void Place(TileObject tileObject, bool floating = false)
 	{
-		Vector2I fromDir = tileObject.TilePostion - TilePosition;
+		var fromDir = tileObject.TilePostion - TilePosition;
 		//normalise into simple directions
 		if (fromDir.X != 0)
 			fromDir.X = fromDir.X > 0 ? 1 : -1;
 		if (fromDir.Y != 0)
 			fromDir.Y = fromDir.Y > 0 ? 1 : -1;
-		
+
 		tileObject.ParentTile = this;
 		tileObject.GlobalPosition = TileManager.MapToLocal(TilePosition);
 
 		if (floating || tileObject.HasTrait<Float>())
-		{
-			FloatedOn(tileObject,fromDir);
-		}
+			FloatedOn(tileObject, fromDir);
 		else
-		{
-			SteppedOn(tileObject,fromDir);
-		}
-		
+			SteppedOn(tileObject, fromDir);
+
 		tileObject.TileEntered(this);
 		TileObjects.Add(tileObject);
 	}
 
-	private List<TileObject> SafeList = new List<TileObject>();
 	private List<TileObject> GetSafeList()
 	{
-		SafeList.Clear();
-		SafeList.AddRange(TileObjects);
-		return SafeList;
+		_safeList.Clear();
+		_safeList.AddRange(TileObjects);
+		return _safeList;
 	}
+
 	private void FloatedOn(TileObject tileObject, Vector2I fromDir)
 	{
 		foreach (var to in GetSafeList())
 		{
-			to.FloatedOn(tileObject,fromDir);
-			
+			to.FloatedOn(tileObject, fromDir);
+
 			//if we move into another floating object we "step" on it
-			if (to.HasTrait<Float>())
-			{
-				to.SteppedOn(tileObject,fromDir);
-			}
+			if (to.HasTrait<Float>()) to.SteppedOn(tileObject, fromDir);
 		}
 	}
 
@@ -72,12 +66,8 @@ public partial class Tile
 	{
 		foreach (var to in GetSafeList())
 		{
-			to.SteppedOn(o,fromDir);
-			if (to.HasTrait<Float>())
-			{
-				to.SteppedUnder(o,fromDir);
-			}
+			to.SteppedOn(o, fromDir);
+			if (to.HasTrait<Float>()) to.SteppedUnder(o, fromDir);
 		}
 	}
-
 }

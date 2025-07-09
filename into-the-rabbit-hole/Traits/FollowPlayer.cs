@@ -16,28 +16,21 @@ public class FollowPlayer : Trait
 	{
 		//find player
 		var p = Player.Instance;
-		
+
 		//move towards
-		if (p == null || p.TilePostion == _owner.TilePostion)
+		if (p == null || p.TilePostion == Owner.TilePostion)
 			return;
-		var direction = p.TilePostion - _owner.TilePostion;
+		var direction = p.TilePostion - Owner.TilePostion;
 		//convert into best fitting flat direction
 		if (Math.Abs(direction.X) > Math.Abs(direction.Y))
-		{
 			direction = new Vector2I(Math.Sign(direction.X), 0);
-		}
 		else
-		{
 			direction = new Vector2I(0, Math.Sign(direction.Y));
-		}
 
-		
+
 		GD.Print(direction.ToString());
-		
-		var postToMove = _owner.TilePostion + direction;
-		TileManager.Instance.Move(_owner, postToMove);
-		
-	}
 
-	
+		var postToMove = Owner.TilePostion + direction;
+		TileManager.Instance.Move(Owner, postToMove);
+	}
 }
