@@ -9,8 +9,8 @@ public class Tile
 	public readonly TileManager TileManager;
 	public GroundType GroundType;
 
-	private readonly List<TileObject> _safeList = new();
-	public List<TileObject> TileObjects = new();
+	private readonly List<TileObjects.TileObject> _safeList = new();
+	public List<TileObjects.TileObject> TileObjects = new();
 	public Vector2I TilePosition;
 
 	public Tile(int x, int y, TileManager tmanager)
@@ -22,7 +22,7 @@ public class Tile
 	}
 
 	//floating bool is a special case for the player jumping over
-	public void Place(TileObject tileObject, bool floating = false)
+	public void Place(TileObjects.TileObject tileObject, bool floating = false)
 	{
 		var fromDir = tileObject.TilePostion - TilePosition;
 		//normalise into simple directions
@@ -43,14 +43,14 @@ public class Tile
 		TileObjects.Add(tileObject);
 	}
 
-	private List<TileObject> GetSafeList()
+	private List<TileObjects.TileObject> GetSafeList()
 	{
 		_safeList.Clear();
 		_safeList.AddRange(TileObjects);
 		return _safeList;
 	}
 
-	private void FloatedOn(TileObject tileObject, Vector2I fromDir)
+	private void FloatedOn(TileObjects.TileObject tileObject, Vector2I fromDir)
 	{
 		foreach (var to in GetSafeList())
 		{
@@ -62,7 +62,7 @@ public class Tile
 	}
 
 
-	public void SteppedOn(TileObject o, Vector2I fromDir)
+	public void SteppedOn(TileObjects.TileObject o, Vector2I fromDir)
 	{
 		foreach (var to in GetSafeList())
 		{

@@ -6,7 +6,7 @@ public class Camo : Trait
 {
 	private readonly Sprite2D _ownerSprite;
 
-	public Camo(TileObject o) : base(o)
+	public Camo(TileObjects.TileObject o) : base(o)
 	{
 		_ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
 	}

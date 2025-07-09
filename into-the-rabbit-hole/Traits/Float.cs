@@ -5,7 +5,7 @@ namespace IntoTheRabbitHole.Traits;
 
 public class Float : Trait
 {
-	public Float(TileObject o) : base(o)
+	public Float(TileObjects.TileObject o) : base(o)
 	{
 	}
 

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using IntoTheRabbitHole;
 using IntoTheRabbitHole.Tiles;
+using IntoTheRabbitHole.Traits;
+
+namespace IntoTheRabbitHole.TileObjects;
 
 public partial class TileObject : Node2D
 {

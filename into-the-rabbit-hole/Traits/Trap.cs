@@ -6,7 +6,7 @@ public class Trap : Trait
 {
 	private readonly Sprite2D _ownerSprite;
 
-	public Trap(TileObject o) : base(o)
+	public Trap(TileObjects.TileObject o) : base(o)
 	{
 		_ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
 
@@ -16,7 +16,7 @@ public class Trap : Trait
 
 	public override ushort ExecutionPriority => 5;
 
-	public override void SteppedOn(TileObject tileObject, Vector2I fromDir)
+	public override void SteppedOn(TileObjects.TileObject tileObject, Vector2I fromDir)
 	{
 		tileObject.Kill();
 	}

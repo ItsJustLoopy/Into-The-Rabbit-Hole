@@ -6,7 +6,7 @@ public class Grabber : Trait
 {
 	private readonly Sprite2D _ownerSprite;
 
-	public Grabber(TileObject o) : base(o)
+	public Grabber(TileObjects.TileObject o) : base(o)
 	{
 		_ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
 
@@ -15,12 +15,12 @@ public class Grabber : Trait
 
 	public override ushort ExecutionPriority => 4;
 
-	public override void FloatedOn(TileObject tileObject, Vector2I fromDir)
+	public override void FloatedOn(TileObjects.TileObject tileObject, Vector2I fromDir)
 	{
 		tileObject.Kill();
 	}
 
-	public override void SteppedUnder(TileObject tileObject, Vector2I fromDir)
+	public override void SteppedUnder(TileObjects.TileObject tileObject, Vector2I fromDir)
 	{
 		tileObject.Kill();
 	}

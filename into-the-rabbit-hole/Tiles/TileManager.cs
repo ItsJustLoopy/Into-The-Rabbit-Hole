@@ -11,22 +11,22 @@ public partial class TileManager : Node
 	public static TileManager Instance;
 	private TileMapLayer _tileMap;
 	private Tile[,] _tiles;
-
-
+	
 	private float _camraRotation;
-	private readonly List<TileObject> _globalList = new();
+	
+	private readonly List<TileObjects.TileObject> _globalList = new();
 
-
+	private readonly List<Action> _postTickActions = new();
 	private readonly List<Action> _nextTickActions = new();
 
 
 	private bool _playeMoveCompleteFlag;
 	private bool _playerMoveing;
-	private readonly List<Action> _postTickActions = new();
+
 	private bool _tickInProgress;
-
-
 	private double _timeTillNextTick = 1;
+
+	public double TimeTillePlayerKill = 100f;
 
 	public override void _Ready()
 	{
@@ -54,13 +54,13 @@ public partial class TileManager : Node
 		for (int i = 0; i < 15; i += 3)
 		{
 			var trapTile = GetTile(new Vector2I(i, 8));
-			if (trapTile != null) new TileObject(trapTile, "Trap");
+			if (trapTile != null) new TileObjects.TileObject(trapTile, "Trap");
 		}
 
 		for (int i = 0; i < 15; i += 3)
 		{
 			var trapTile = GetTile(new Vector2I(i, 12));
-			if (trapTile != null) new TileObject(trapTile, "JumpTrap");
+			if (trapTile != null) new TileObjects.TileObject(trapTile, "JumpTrap");
 		}
 
 		//make some collectibles
@@ -68,18 +68,18 @@ public partial class TileManager : Node
 		for (int i = 0; i < 15; i += 3)
 		{
 			var collectTile = GetTile(new Vector2I(i, 4));
-			if (collectTile != null) new TileObject(collectTile, "Carrot");
+			if (collectTile != null) new TileObjects.TileObject(collectTile, "Carrot");
 		}
 
 		var randomTile = GetTile(new Vector2I(GD.RandRange(-5, 5), GD.RandRange(-5, 5)));
-		new TileObject(randomTile, "Hawk");
+		new TileObjects.TileObject(randomTile, "Hawk");
 		randomTile = GetTile(new Vector2I(GD.RandRange(-5, 5), GD.RandRange(-5, 5)));
-		new TileObject(randomTile, "Hawk");
+		new TileObjects.TileObject(randomTile, "Hawk");
 		randomTile = GetTile(new Vector2I(GD.RandRange(-5, 5), GD.RandRange(-5, 5)));
-		new TileObject(randomTile, "Hawk");
+		new TileObjects.TileObject(randomTile, "Hawk");
 	}
 
-	private List<TileObject> GetGlobalList()
+	private List<TileObjects.TileObject> GetGlobalList()
 	{
 		_globalList.Clear();
 		//we collect all objects and update them, "updating tiles" will cause moving objects to get ticked more than once
@@ -105,8 +105,12 @@ public partial class TileManager : Node
 
 	public override void _Process(double delta)
 	{
-		if (!_playerMoveing) //game is paused during player movement
+		if (!_playerMoveing)
+		{
 			_timeTillNextTick -= delta;
+			TimeTillePlayerKill -= delta;
+		}
+			
 		if (_timeTillNextTick <= 0)
 		{
 			_tickInProgress = true;
@@ -115,6 +119,12 @@ public partial class TileManager : Node
 			_timeTillNextTick = 1f;
 		}
 
+		if (TimeTillePlayerKill <= 0)
+		{
+			Player.Instance.Kill();
+		}
+		
+		
 		base._Process(delta);
 	}
 
@@ -154,7 +164,7 @@ public partial class TileManager : Node
 		return _tileMap.MapToLocal(playerTilePosition);
 	}
 
-	public void Move(TileObject o, Vector2I pos, bool tempFloat = false)
+	public void Move(TileObjects.TileObject o, Vector2I pos, bool tempFloat = false)
 	{
 		var targetTile = GetTile(pos);
 		if (targetTile == null)
@@ -166,7 +176,7 @@ public partial class TileManager : Node
 		Move(o, targetTile, tempFloat);
 	}
 
-	private void Move(TileObject o, Tile target, bool tempFloat = false)
+	private void Move(TileObjects.TileObject o, Tile target, bool tempFloat = false)
 	{
 		if (o.ParentTile != null) o.ParentTile.TileObjects.Remove(o);
 		target.Place(o, tempFloat);
@@ -179,7 +189,7 @@ public partial class TileManager : Node
 		}
 	}
 
-	public void PlayerMove(TileObject o, Vector2I dir)
+	public void PlayerMove(TileObjects.TileObject o, Vector2I dir)
 	{
 		//sanity check
 		if (o.GetType() != typeof(Player))
@@ -187,6 +197,7 @@ public partial class TileManager : Node
 			GD.PrintErr("PlayerMove called on non-player object: " + o.GetType());
 			return;
 		}
+		if(_playerMoveing) return;
 
 		var player = (Player) o;
 		//do this in a separate thread to avoid blocking the main thread

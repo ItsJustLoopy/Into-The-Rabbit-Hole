@@ -4,13 +4,13 @@ namespace IntoTheRabbitHole.Traits;
 
 public class Collectible : Trait
 {
-	public Collectible(TileObject o) : base(o)
+	public Collectible(TileObjects.TileObject o) : base(o)
 	{
 	}
 
 	public override ushort ExecutionPriority => 80;
 
-	public override void SteppedOn(TileObject o, Vector2I fromDir)
+	public override void SteppedOn(TileObjects.TileObject o, Vector2I fromDir)
 	{
 		var player = o as Player;
 		if (player != null)

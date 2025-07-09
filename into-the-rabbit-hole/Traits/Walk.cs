@@ -5,7 +5,7 @@ namespace IntoTheRabbitHole.Traits;
 
 public class Walk : Trait
 {
-	public Walk(TileObject o) : base(o)
+	public Walk(TileObjects.TileObject o) : base(o)
 	{
 	}
 

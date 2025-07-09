@@ -4,7 +4,7 @@ namespace IntoTheRabbitHole.Traits;
 
 public class Attack : Trait
 {
-	public Attack(TileObject o) : base(o)
+	public Attack(TileObjects.TileObject o) : base(o)
 	{
 	}
 

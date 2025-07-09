@@ -7,7 +7,7 @@ public class Patrol : Trait
 {
 	private readonly int _dirInt = GD.RandRange(0, 3);
 
-	public Patrol(TileObject o) : base(o)
+	public Patrol(TileObjects.TileObject o) : base(o)
 	{
 	}
 

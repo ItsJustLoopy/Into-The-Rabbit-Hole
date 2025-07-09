@@ -6,7 +6,7 @@ namespace IntoTheRabbitHole.Traits;
 
 public class FollowPlayer : Trait
 {
-	public FollowPlayer(TileObject o) : base(o)
+	public FollowPlayer(TileObjects.TileObject o) : base(o)
 	{
 	}
 

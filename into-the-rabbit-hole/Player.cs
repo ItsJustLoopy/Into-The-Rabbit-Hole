@@ -4,7 +4,7 @@ using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole;
 
-public partial class Player : TileObject
+public partial class Player : TileObjects.TileObject
 {
 	public static Player Instance;
 	private Camera2D _cam;
