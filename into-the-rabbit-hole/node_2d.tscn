@@ -11,6 +11,9 @@ shader_parameter/intensity = 0.0
 shader_parameter/max_zoom = 2.0
 shader_parameter/max_shake = 0.05
 shader_parameter/time_scale = 1.0
+shader_parameter/offset_mod = 0.1
+shader_parameter/eye_aspect = 2.0
+shader_parameter/eye_sharpness = 2.0
 
 [node name="Node2D" type="Node2D"]
 

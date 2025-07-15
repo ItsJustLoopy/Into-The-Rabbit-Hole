@@ -32,7 +32,7 @@ public partial class UI : ColorRect
 		var movementFactor = Mathf.Clamp(1.0f - (float)(killTime / maxKillTime), 0.0f, 1.0f);
 		
 		Shader.SetShaderParameter("intensity", movementFactor);
-    
+		GD.Print($"intensityr=: {movementFactor}");
 		// Interpolate fox position towards screen center
 		var targetPosition = screenCenter - (Fox.Size / 2); // Center the fox sprite
 		var currentPosition = Fox.Position;
