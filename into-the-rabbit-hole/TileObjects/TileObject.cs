@@ -12,27 +12,32 @@ public partial class TileObject : Node2D
 	public bool Solid = false;
 	private Sprite2D _sprite = new();
 	private readonly List<Trait> _traits = new();
+	public string Type;
 
 	public TileObject(Tile parentTile, string type)
 	{
 		ParentTile = parentTile;
+		Type = type;
 
 		var objDef = Database.GetObjectType(type);
 
-		_sprite.Texture = objDef.Texture;
-		_sprite.Name = "Sprite2D";
-		AddChild(_sprite);
-
-
+		if (objDef.Texture != null)
+		{
+			_sprite.Texture = objDef.Texture;
+			_sprite.Name = "Sprite2D";
+			AddChild(_sprite);
+		}
+		
 		foreach (var t in objDef.Traits) _traits.Add((Trait) Activator.CreateInstance(t, this));
 		//sort by execution order
 		_traits.Sort((traitA, traitB) => traitA.ExecutionPriority.CompareTo(traitB.ExecutionPriority));
-
+		
+		
 		TileManager.Instance.AddChild(this);
 		ParentTile.Place(this);
 	}
 
-	public Vector2I TilePostion => ParentTile.TilePosition;
+	public Vector2I TilePostion => ParentTile.TilePosition; // mfw I try to access "TilePosition" and it doesn't exist because of a spelling error
 
 
 	public override void _Process(double delta)
@@ -91,8 +96,16 @@ public partial class TileObject : Node2D
 	{
 		//roatate sprites to stay upright
 		if (_sprite != null)
-			_sprite.Rotation = camRotation; //OBJECT IS KILL WHY STILL TRACKED?
+			_sprite.Rotation = camRotation; //OBJECT IS KILL WHY STILL TRACKED? - calm down bro
 		else
 			GD.PrintErr("TileObject has no sprite to update camera position.");
 	}
+	
+	public Sprite2D GetSprite()
+	{
+		return _sprite;
+	}
+
+	
+	
 }

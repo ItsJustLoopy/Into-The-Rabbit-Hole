@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Godot;
 using IntoTheRabbitHole.Traits;
 
@@ -7,7 +7,26 @@ namespace IntoTheRabbitHole.Tiles;
 public class Tile
 {
 	public readonly TileManager TileManager;
-	public GroundType GroundType;
+	private GroundType? _groundType;
+
+	public GroundType? GroundType
+	{
+		get => _groundType;
+		set
+		{
+			if (_groundType != null)
+			{
+				_groundType.QueueFree(); // Remove from scene tree
+			}
+
+			_groundType = value;
+			if (_groundType != null)
+			{
+				_groundType.Position = TileManager.MapToLocal(TilePosition);
+				TileManager.AddChild(_groundType);
+			}
+		}
+	}
 
 	private readonly List<TileObjects.TileObject> _safeList = new();
 	public List<TileObjects.TileObject> TileObjects = new();
@@ -17,8 +36,6 @@ public class Tile
 	{
 		TilePosition = new Vector2I(x, y);
 		TileManager = tmanager;
-		GroundType = new GroundType(this, "Grass");
-		tmanager.AddChild(GroundType);
 	}
 
 	//floating bool is a special case for the player jumping over

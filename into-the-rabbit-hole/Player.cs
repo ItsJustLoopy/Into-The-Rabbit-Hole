@@ -8,7 +8,7 @@ public partial class Player : TileObjects.TileObject
 {
 	public static Player Instance;
 	private Camera2D _cam;
-	private float _camLerpSpeed = 9f; // Speed of camera rotation lerp
+	private float _camLerpSpeed = 10f; // Speed of camera rotation lerp
 	private float _currentRotation; // Track player's current rotation in radians
 
 	public Player(Tile parentTil) : base(parentTil, "Player")
@@ -16,6 +16,8 @@ public partial class Player : TileObjects.TileObject
 		Instance = this;
 		_cam = new Camera2D();
 		_cam.IgnoreRotation = false;
+		_cam.Zoom = new Vector2(3, 3); 
+		
 		AddChild(_cam);
 	}
 

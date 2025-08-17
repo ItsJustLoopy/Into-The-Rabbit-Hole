@@ -1,17 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dblkdi0wg52u"]
+[gd_scene load_steps=2 format=3 uid="uid://dblkdi0wg52u"]
 
-[sub_resource type="Gradient" id="Gradient_pcs6e"]
-offsets = PackedFloat32Array(0, 0.457293, 1)
-colors = PackedColorArray(0, 0.298039, 0, 1, 0, 0.773824, 0, 1, 0, 0.298039, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_innkt"]
-gradient = SubResource("Gradient_pcs6e")
-width = 16
-height = 16
-fill_from = Vector2(0.0213675, 0)
-fill_to = Vector2(1, 1)
+[ext_resource type="Texture2D" uid="uid://d4k6sk2pnh3y4" path="res://Assets/Textures/Forrest/forest-ground.png" id="1_innkt"]
 
 [node name="Grass" type="Node2D"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = SubResource("GradientTexture2D_innkt")
+texture = ExtResource("1_innkt")

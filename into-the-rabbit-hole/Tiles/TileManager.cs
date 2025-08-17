@@ -9,9 +9,13 @@ namespace IntoTheRabbitHole.Tiles;
 public partial class TileManager : Node
 {
 	public static TileManager Instance;
+	[Export] private LevelGenerator _levelGenerator;
 	private TileMapLayer _tileMap;
+	private TileMapLayer _occlusionLayer;
 	private Tile[,] _tiles;
-	
+	public int CurrentLevel = 1;
+	private int MapSize;
+
 	private float _camraRotation;
 	
 	private readonly List<TileObjects.TileObject> _globalList = new();
@@ -31,7 +35,10 @@ public partial class TileManager : Node
 	public override void _Ready()
 	{
 		Instance = this;
-		_tileMap = GetNode<TileMapLayer>("TileMapLayer");
+		_tileMap = GetNode<TileMapLayer>("GroundLayer");
+		MapSize = Database.GetLevel(CurrentLevel).MapSize;
+		_levelGenerator.MapSize = MapSize;
+		
 		if (_tileMap == null)
 		{
 			GD.PrintErr("TileMapLayer node not found in TileManager.");
@@ -39,44 +46,16 @@ public partial class TileManager : Node
 		}
 
 		// Initialize or load tiles here if needed
-		_tiles = new Tile[100, 100];
+		_tiles = new Tile[MapSize, MapSize];
 
 		// Populate the tile array with Tile objects
 		for (int x = 0; x < _tiles.GetLength(0); x++)
 		for (int y = 0; y < _tiles.GetLength(1); y++)
-			_tiles[x, y] = new Tile(x - 50, y - 50, this); // Adjusting for center origin
+			_tiles[x, y] = new Tile(x - (MapSize/2), y - (MapSize/2), this); // Adjusting for center origin
+		
+		_levelGenerator.Initialize();
+		_levelGenerator.GenerateLevel();
 
-		var tile = GetTile(0, 0);
-		var p = new Player(tile);
-		Move(p, tile);
-
-
-		for (int i = 0; i < 15; i += 3)
-		{
-			var trapTile = GetTile(new Vector2I(i, 8));
-			if (trapTile != null) new TileObjects.TileObject(trapTile, "Trap");
-		}
-
-		for (int i = 0; i < 15; i += 3)
-		{
-			var trapTile = GetTile(new Vector2I(i, 12));
-			if (trapTile != null) new TileObjects.TileObject(trapTile, "JumpTrap");
-		}
-
-		//make some collectibles
-
-		for (int i = 0; i < 15; i += 3)
-		{
-			var collectTile = GetTile(new Vector2I(i, 4));
-			if (collectTile != null) new TileObjects.TileObject(collectTile, "Carrot");
-		}
-
-		var randomTile = GetTile(new Vector2I(GD.RandRange(-5, 5), GD.RandRange(-5, 5)));
-		new TileObjects.TileObject(randomTile, "Hawk");
-		randomTile = GetTile(new Vector2I(GD.RandRange(-5, 5), GD.RandRange(-5, 5)));
-		new TileObjects.TileObject(randomTile, "Hawk");
-		randomTile = GetTile(new Vector2I(GD.RandRange(-5, 5), GD.RandRange(-5, 5)));
-		new TileObjects.TileObject(randomTile, "Hawk");
 	}
 
 	private List<TileObjects.TileObject> GetGlobalList()
@@ -146,8 +125,8 @@ public partial class TileManager : Node
 	public Tile GetTile(Vector2I position)
 	{
 		//convert from tilemap coordinates to array coordinates
-		int x = position.X + 50; // Assuming the tilemap is centered at (0,0)
-		int y = position.Y + 50; // Adjust based on your tilemap's origin
+		int x = position.X + (MapSize/2); // Assuming the tilemap is centered at (0,0)
+		int y = position.Y + (MapSize/2); // Adjust based on your tilemap's origin
 
 		if (x < 0 || x >= _tiles.GetLength(0) || y < 0 || y >= _tiles.GetLength(1))
 		{
@@ -267,6 +246,7 @@ public partial class TileManager : Node
 			_playerMoveing = false;
 		});
 	}
+
 
 	public void UpdateCameraPosition(float camRotation)
 	{

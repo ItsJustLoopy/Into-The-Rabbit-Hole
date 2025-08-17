@@ -1,0 +1,334 @@
+using System;
+using Godot;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace IntoTheRabbitHole.Tiles;
+
+public partial class LevelGenerator : Node
+{
+	// Procedural generation stuff
+	[Export] private NoiseTexture2D _noiseTexture;
+	[Export] private int _seed;
+	[Export] private float _groundThreshold = 0.3f;
+
+	public int MapSize;
+	private FastNoiseLite _noise;
+	private Random _random;
+	private Player _player;
+	private bool _playerXIsOdd, _playerYIsOdd;
+
+	// Level stuff
+	private Database.Level _level;
+
+	// Terrain stuff
+	[Export] public TileMapLayer WallTileMap;
+	[Export] public int WallSource, TerrainSetId;
+	private Database.TerrainConfig _terrainConfig;
+
+
+	public void Initialize()
+	{
+		_seed = new Random().Next(); // TODO allow input for seeded runs
+		_noise = _noiseTexture.Noise as FastNoiseLite;
+		_random = new Random(_seed);
+
+		_noise.Seed = _seed;
+
+		ConfigureNoise();
+		GD.Print($"Generating level with seed: {_seed}");
+
+
+		_level = Database.GetLevel(TileManager.Instance.CurrentLevel);
+		GD.Print($"Starting level generation for level {TileManager.Instance.CurrentLevel}");
+		GD.Print($"Level config: {_level.TileObjects.Count} object types to place");
+
+
+		_terrainConfig = Database.GetTerrainConfigForLevel(TileManager.Instance.CurrentLevel);
+		GD.Print($"Terrain config: {_terrainConfig.MainGround} main ground, {_terrainConfig.Threshold} threshold");
+
+
+	}
+
+	private void ConfigureNoise()
+	{
+		if (_noise == null) return;
+
+		_noise.FractalOctaves = 5; // Noise layers
+		_noise.Frequency = 0.3f; // How large the variation is (best to keep at low value)
+		_noise.FractalLacunarity = 2f; // Frequency increase in each consecutive octave
+		_noise.FractalGain = 0.5f; // How much each octave matters to the final result (each is half the last at 0.5)
+	}
+
+	public void GenerateLevel()
+	{
+		GenerateBaseTerrain();
+		SpawnPlayer();
+		PopulateObjects();
+	}
+
+	private void GenerateBaseTerrain()
+	{
+		// Terrain determinant
+		bool[,] terrainMap = new bool[MapSize, MapSize];
+		for (int x = 0; x < MapSize; x++)
+		{
+			for (int y = 0; y < MapSize; y++)
+			{
+				float noiseValue = _noise.GetNoise2D(x, y);
+				terrainMap[x, y] = noiseValue > _terrainConfig.Threshold;
+			}
+		}
+
+		// Apply cellular automata thingamabob
+		for (int i = 0; i < 5; i++)
+		{
+			terrainMap = ApplyCellularAutomata(terrainMap);
+		}
+
+		// Ground and walls
+		for (int x = 0; x < MapSize; x++)
+		{
+			for (int y = 0; y < MapSize; y++)
+			{
+				var tile = GetTileManagerTileAt(x, y);
+
+				
+				tile.GroundType = new GroundType(tile, _terrainConfig.MainGround);
+
+				// Place walls where theres a false
+				if (!terrainMap[x, y])
+				{
+					PlaceObjectAt(tile, "Wall");
+				}
+
+			}
+		}
+		WallTileMap.SetCellsTerrainConnect(WallTileMap.GetUsedCells(), TerrainSetId, 1);
+
+	}
+
+	private void PopulateObjects()
+	{
+		if (_level.TileObjects == null)
+		{
+			GD.PrintErr("No tile objects defined for this level !");
+			return;
+		}
+
+		foreach (var objectType in _level.TileObjects)
+		{
+			//GD.Print($"Attempting to place {objectType.Value} objects of type {objectType.Key}"); shhh
+			int remainingObjects = objectType.Value;
+			int attempts = 0;
+			int maxAttempts = remainingObjects * 3;
+			int placed = 0;
+
+			while (remainingObjects > 0 && attempts < maxAttempts)
+			{
+				attempts++;
+				int x = _random.Next(MapSize);
+				int y = _random.Next(MapSize);
+
+				var tile = GetTileManagerTileAt(x, y);
+				var xIsOdd = IsOdd(x);
+				var yIsOdd = IsOdd(y);
+
+				if (tile != null && CanPlaceObjectAt(tile)
+								 && xIsOdd == _playerXIsOdd && yIsOdd == _playerYIsOdd)
+				{
+					PlaceObjectAt(tile, objectType.Key);
+					placed++;
+					remainingObjects--;
+				}
+			}
+
+			GD.Print($"Placed {placed} objects of type {objectType.Key} after {attempts} attempts");
+		}
+
+	}
+
+	private void PlaceObjectAt(Tile tile, string objectType)
+	{
+		if (tile != null)
+		{
+			if (objectType == "Wall")
+			{
+				new TileObjects.TileObject(tile, "Wall");
+
+				WallTileMap.SetCell(
+					tile.TilePosition,
+					WallSource,
+					Vector2I.Zero
+				);
+
+
+			}
+			else
+			{
+				new TileObjects.TileObject(tile, objectType);
+			}
+		}
+		else
+		{
+			GD.PrintErr($"Cannot place object at {tile.TilePosition} - tile is null");
+		}
+	}
+
+
+
+private bool[,] ApplyCellularAutomata(bool[,] map)
+	{
+		bool[,] newMap = new bool[MapSize, MapSize];
+
+		for (int x = 0; x < MapSize; x++)
+		{
+			for (int y = 0; y < MapSize; y++)
+			{
+				int wallCount = CountWallNeighbors(map, x, y);
+				
+				// Thicker walls near edges
+				int distanceFromEdge = Math.Min(
+					Math.Min(x, MapSize - 1 - x),
+					Math.Min(y, MapSize - 1 - y)
+				);
+				
+				// Wall threshold is based on distance from edge
+				int wallThreshold = distanceFromEdge < 5 ? 3 : 4;
+				
+				// If a cell has more than wallThreshold neighbors, it becomes a wall
+				newMap[x, y] = wallCount < wallThreshold;
+				
+				// Force walls at the edges 
+				if (x < (MapSize/5) || y < (MapSize/5) || x >= MapSize - (MapSize/5) || y >= MapSize - (MapSize/5))
+				{
+					newMap[x, y] = false; // False = wall
+				}
+
+			}
+		}
+
+		return newMap;
+	}
+
+	private int CountWallNeighbors(bool[,] map, int x, int y)
+	{
+		int count = 0;
+		for (int i = -1; i <= 1; i++)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				int nx = x + i;
+				int ny = y + j;
+				
+				// Count outof bounds cells as walls
+				if (nx < 0 || ny < 0 || nx >= MapSize || ny >= MapSize)
+				{
+					count++;
+					continue;
+				}
+					
+				if (!map[nx, ny]) // false = wall
+					count++;
+			}
+		}
+		return count;
+	}
+	
+	
+	private void ClearWallVisuals()
+	{
+		WallTileMap.Clear();
+	}
+	
+	public void RefreshWallVisuals()
+	{
+		ClearWallVisuals();
+		
+		for (int x = 0; x < MapSize; x++)
+		{
+			for (int y = 0; y < MapSize; y++)
+			{
+				var tile = GetTileManagerTileAt(x, y);
+				if (tile.TileObjects.Exists(obj => obj.Type == "Wall"))
+				{
+					WallTileMap.SetCell(
+						tile.TilePosition,
+						WallSource,
+						Vector2I.Zero
+					);
+				}
+			}
+		} 
+		WallTileMap.SetCellsTerrainConnect(WallTileMap.GetUsedCells(), TerrainSetId, 1);
+	}
+
+	
+	private Tile GetTileManagerTileAt(int x, int y)
+	{
+		var tile = TileManager.Instance.GetTile(new Vector2I(x - (MapSize / 2), y - (MapSize / 2)));
+		return tile;
+	}
+
+	
+	
+	private bool CanPlaceObjectAt(Tile tile)
+	{
+		
+		if (tile.GroundType == null)
+		{
+			GD.Print($"Cannot place object: No ground type at {tile.TilePosition}");
+			return false;
+		}
+
+		if (tile.TileObjects.Count > 0)
+		{
+			GD.Print($"Cannot place object: Tile already has objects at {tile.TilePosition}");
+			return false;
+		}
+		
+		return true;
+	}
+
+	private void SpawnPlayer()
+	{
+		var playerSpawn = new Vector2I(_random.Next(MapSize/4,MapSize/2), _random.Next(MapSize/4,MapSize/2));
+		var playerSpawnTile = GetTileManagerTileAt(playerSpawn.X,playerSpawn.Y);
+
+		if (CanPlaceObjectAt(playerSpawnTile))
+		{
+			_player = new Player(playerSpawnTile);
+			GD.Print($"Player placed at tile: {playerSpawnTile.TilePosition}");
+		
+			_playerXIsOdd = IsOdd(playerSpawn.X);
+			_playerYIsOdd = IsOdd(playerSpawn.Y);
+		}
+		else
+		{
+			GD.PrintErr($"Could not place player at {playerSpawnTile.TilePosition}");
+			SpawnPlayer();
+		}
+		
+	}
+
+	private void UpdateNoiseSeed(int newSeed)
+	{
+		_seed = newSeed;
+		if (_noise != null)
+		{
+			_noise.Seed = _seed;
+		}
+	}
+
+	public int Seed
+	{
+		get => _seed;
+		set => UpdateNoiseSeed(value);
+	}
+	
+	private bool IsOdd(int num)
+	{
+		return num % 2 == 1;
+	}
+
+}

@@ -6,7 +6,9 @@ namespace IntoTheRabbitHole;
 public partial class GroundType : Node2D
 {
 	public Tile ParentTile;
+	public bool IsWalkable = true;
 
+	
 	public GroundType(Tile parentTile, string gType)
 	{
 		ParentTile = parentTile;
