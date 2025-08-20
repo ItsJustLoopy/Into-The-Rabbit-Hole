@@ -1,15 +1,14 @@
 ﻿using Godot;
+using IntoTheRabbitHole.TileObjects;
 using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole.Traits;
 
 public class Patrol : Trait
 {
-	private readonly int _dirInt = GD.RandRange(0, 3);
+	private readonly int dirInt = GD.RandRange(0, 3);
 
-	public Patrol(TileObjects.TileObject o) : base(o)
-	{
-	}
+	public Patrol(TileObject o) : base(o) { }
 
 
 	public override ushort ExecutionPriority => 5;
@@ -17,7 +16,7 @@ public class Patrol : Trait
 	public override void Tick()
 	{
 		var dir = Vector2I.Zero;
-		switch (_dirInt)
+		switch (dirInt)
 		{
 			case 0:
 				dir = Vector2I.Up;
@@ -33,7 +32,7 @@ public class Patrol : Trait
 				break;
 		}
 
-		TileManager.Instance.Move(Owner, Owner.TilePostion + dir);
+		World.Instance.Move(Owner, Owner.TilePostion + dir);
 		//TODO CHEC IF WE BOUNCE OF WALL, CHANGE DIRECTION THEN
 	}
 }

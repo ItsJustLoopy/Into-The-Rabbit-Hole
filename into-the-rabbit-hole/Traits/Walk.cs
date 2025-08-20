@@ -1,13 +1,12 @@
 ﻿using Godot;
+using IntoTheRabbitHole.TileObjects;
 using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole.Traits;
 
 public class Walk : Trait
 {
-	public Walk(TileObjects.TileObject o) : base(o)
-	{
-	}
+	public Walk(TileObject o) : base(o) { }
 
 
 	public override ushort ExecutionPriority => 5;
@@ -32,6 +31,6 @@ public class Walk : Trait
 				break;
 		}
 
-		TileManager.Instance.Move(Owner, Owner.TilePostion + dir);
+		World.Instance.Move(Owner, Owner.TilePostion + dir);
 	}
 }

@@ -1,26 +1,27 @@
 ﻿using Godot;
+using IntoTheRabbitHole.TileObjects;
 
 namespace IntoTheRabbitHole.Traits;
 
 public class Grabber : Trait
 {
-	private readonly Sprite2D _ownerSprite;
+	private readonly Sprite2D ownerSprite;
 
-	public Grabber(TileObjects.TileObject o) : base(o)
+	public Grabber(TileObject o) : base(o)
 	{
-		_ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
+		ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
 
-		_ownerSprite.Modulate = new Color(1, 0, 0, 0.5f); // Semi-transparent red
+		ownerSprite.Modulate = new Color(1, 0, 0, 0.5f); // Semi-transparent red
 	}
 
 	public override ushort ExecutionPriority => 4;
 
-	public override void FloatedOn(TileObjects.TileObject tileObject, Vector2I fromDir)
+	public override void FloatedOn(TileObject tileObject, Vector2I fromDir)
 	{
 		tileObject.Kill();
 	}
 
-	public override void SteppedUnder(TileObjects.TileObject tileObject, Vector2I fromDir)
+	public override void SteppedUnder(TileObject tileObject, Vector2I fromDir)
 	{
 		tileObject.Kill();
 	}
@@ -30,6 +31,6 @@ public class Grabber : Trait
 	{
 		float posOffset = (float) Mathf.Abs(Mathf.Sin(Time.GetTicksMsec() * 0.001) * 0.5f);
 
-		_ownerSprite.Modulate = new Color(1, 1 - posOffset, 0 - posOffset); // Adjust alpha based on position offset
+		ownerSprite.Modulate = new Color(1, 1 - posOffset, 0 - posOffset); // Adjust alpha based on position offset
 	}
 }

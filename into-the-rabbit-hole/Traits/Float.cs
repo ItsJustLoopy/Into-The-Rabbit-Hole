@@ -1,13 +1,12 @@
 ﻿using Godot;
+using IntoTheRabbitHole.TileObjects;
 using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole.Traits;
 
 public class Float : Trait
 {
-	public Float(TileObjects.TileObject o) : base(o)
-	{
-	}
+	public Float(TileObject o) : base(o) { }
 
 	public override ushort ExecutionPriority => 5;
 

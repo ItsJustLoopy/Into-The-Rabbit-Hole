@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=4 uid="uid://c24cl5l57xieo"]
 
-[ext_resource type="Script" uid="uid://mt3r6776cr7x" path="res://Tiles/TileManager.cs" id="1_0e48y"]
+[ext_resource type="Script" uid="uid://cpkbkwx81k1vw" path="res://Tiles/World.cs" id="1_d21ai"]
 [ext_resource type="TileSet" uid="uid://ptrsd0anue7t" path="res://tileset.tres" id="1_wtcfe"]
 [ext_resource type="Script" uid="uid://cwjkjv5daitd6" path="res://Tiles/LevelGenerator.cs" id="2_kdubu"]
 [ext_resource type="Texture2D" uid="uid://b73wea0u7c53n" path="res://Assets/Textures/Forrest/Thornbush-Tileset.png" id="2_q6r6c"]
@@ -8,10 +8,10 @@
 [ext_resource type="Texture2D" uid="uid://decl3m0tneiiw" path="res://Assets/Textures/Forrest/TilesetTest.png" id="3_d21ai"]
 [ext_resource type="Script" uid="uid://cb2j7tjx6utud" path="res://UI.cs" id="3_epypp"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_kdubu"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_d21ai"]
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_d21ai"]
-noise = SubResource("FastNoiseLite_kdubu")
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_rj586"]
+noise = SubResource("FastNoiseLite_d21ai")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_rj586"]
 resource_name = "Test"
@@ -21,33 +21,39 @@ texture_region_size = Vector2i(32, 32)
 0:0/0/terrain_set = 0
 0:0/0/terrain = 1
 0:0/0/terrains_peering_bit/bottom_side = 1
+0:0/0/custom_data_0 = true
 1:0/0 = 0
 1:0/0/terrain_set = 0
 1:0/0/terrain = 1
 1:0/0/terrains_peering_bit/right_side = 1
 1:0/0/terrains_peering_bit/bottom_side = 1
+1:0/0/custom_data_0 = true
 2:0/0 = 0
 2:0/0/terrain_set = 0
 2:0/0/terrain = 1
 2:0/0/terrains_peering_bit/right_side = 1
 2:0/0/terrains_peering_bit/bottom_side = 1
 2:0/0/terrains_peering_bit/left_side = 1
+2:0/0/custom_data_0 = true
 3:0/0 = 0
 3:0/0/terrain_set = 0
 3:0/0/terrain = 1
 3:0/0/terrains_peering_bit/bottom_side = 1
 3:0/0/terrains_peering_bit/left_side = 1
+3:0/0/custom_data_0 = true
 0:1/0 = 0
 0:1/0/terrain_set = 0
 0:1/0/terrain = 1
 0:1/0/terrains_peering_bit/bottom_side = 1
 0:1/0/terrains_peering_bit/top_side = 1
+0:1/0/custom_data_0 = true
 1:1/0 = 0
 1:1/0/terrain_set = 0
 1:1/0/terrain = 1
 1:1/0/terrains_peering_bit/right_side = 1
 1:1/0/terrains_peering_bit/bottom_side = 1
 1:1/0/terrains_peering_bit/top_side = 1
+1:1/0/custom_data_0 = true
 2:1/0 = 0
 2:1/0/terrain_set = 0
 2:1/0/terrain = 1
@@ -55,48 +61,58 @@ texture_region_size = Vector2i(32, 32)
 2:1/0/terrains_peering_bit/bottom_side = 1
 2:1/0/terrains_peering_bit/left_side = 1
 2:1/0/terrains_peering_bit/top_side = 1
+2:1/0/custom_data_0 = true
 3:1/0 = 0
 3:1/0/terrain_set = 0
 3:1/0/terrain = 1
 3:1/0/terrains_peering_bit/bottom_side = 1
 3:1/0/terrains_peering_bit/left_side = 1
 3:1/0/terrains_peering_bit/top_side = 1
+3:1/0/custom_data_0 = true
 0:2/0 = 0
 0:2/0/terrain_set = 0
 0:2/0/terrain = 1
 0:2/0/terrains_peering_bit/top_side = 1
+0:2/0/custom_data_0 = true
 1:2/0 = 0
 1:2/0/terrain_set = 0
 1:2/0/terrain = 1
 1:2/0/terrains_peering_bit/right_side = 1
 1:2/0/terrains_peering_bit/top_side = 1
+1:2/0/custom_data_0 = true
 2:2/0 = 0
 2:2/0/terrain_set = 0
 2:2/0/terrain = 1
 2:2/0/terrains_peering_bit/right_side = 1
 2:2/0/terrains_peering_bit/left_side = 1
 2:2/0/terrains_peering_bit/top_side = 1
+2:2/0/custom_data_0 = true
 3:2/0 = 0
 3:2/0/terrain_set = 0
 3:2/0/terrain = 1
 3:2/0/terrains_peering_bit/left_side = 1
 3:2/0/terrains_peering_bit/top_side = 1
+3:2/0/custom_data_0 = true
 0:3/0 = 0
 0:3/0/terrain_set = 0
 0:3/0/terrain = 1
+0:3/0/custom_data_0 = true
 1:3/0 = 0
 1:3/0/terrain_set = 0
 1:3/0/terrain = 1
 1:3/0/terrains_peering_bit/right_side = 1
+1:3/0/custom_data_0 = true
 2:3/0 = 0
 2:3/0/terrain_set = 0
 2:3/0/terrain = 1
 2:3/0/terrains_peering_bit/right_side = 1
 2:3/0/terrains_peering_bit/left_side = 1
+2:3/0/custom_data_0 = true
 3:3/0 = 0
 3:3/0/terrain_set = 0
 3:3/0/terrain = 1
 3:3/0/terrains_peering_bit/left_side = 1
+3:3/0/custom_data_0 = true
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q6r6c"]
 resource_name = "ThronBush"
@@ -182,6 +198,8 @@ terrain_set_0/terrain_0/name = "Thronbush"
 terrain_set_0/terrain_0/color = Color(0.216858, 1, 0.41499, 1)
 terrain_set_0/terrain_1/name = "TestTerrain"
 terrain_set_0/terrain_1/color = Color(0.501961, 0.439216, 0.960784, 1)
+custom_data_layer_0/name = "solid"
+custom_data_layer_0/type = 1
 sources/1 = SubResource("TileSetAtlasSource_q6r6c")
 sources/0 = SubResource("TileSetAtlasSource_rj586")
 
@@ -197,27 +215,25 @@ shader_parameter/eye_sharpness = 2.0
 
 [node name="Node2D" type="Node2D"]
 
-[node name="TileManager" type="Node" parent="." node_paths=PackedStringArray("_levelGenerator")]
+[node name="World" type="Node" parent="."]
 process_thread_group = 1
 process_thread_group_order = 0
 process_thread_messages = 0
-script = ExtResource("1_0e48y")
-_levelGenerator = NodePath("LevelGenerator")
+script = ExtResource("1_d21ai")
 
-[node name="LevelGenerator" type="Node" parent="TileManager" node_paths=PackedStringArray("WallTileMap")]
+[node name="LevelGenerator" type="Node" parent="World"]
 process_thread_group = 2
 process_thread_group_order = 0
 process_thread_messages = 0
 script = ExtResource("2_kdubu")
-_noiseTexture = SubResource("NoiseTexture2D_d21ai")
-WallTileMap = NodePath("../UpperLayer")
+noiseTexture = SubResource("NoiseTexture2D_rj586")
 
-[node name="UpperLayer" type="TileMapLayer" parent="TileManager"]
+[node name="WallLayer" type="TileMapLayer" parent="World"]
 z_index = 1
 scale = Vector2(0.5, 0.5)
 tile_set = SubResource("TileSet_d21ai")
 
-[node name="GroundLayer" type="TileMapLayer" parent="TileManager"]
+[node name="GroundLayer" type="TileMapLayer" parent="World"]
 tile_map_data = PackedByteArray("AAD+/wAAAAABAAEAAAD+/wEAAAABAAEAAAD//wEAAAABAAEAAAD//wAAAAABAAEAAAAAAAAAAAABAAEAAAAAAP//AAABAAEAAAD/////AAABAAEAAAD+////AAABAAEAAAD9////AAABAAEAAAD9/wAAAAABAAEAAAABAP//AAABAAEAAAD///7/AAABAAEAAAD6//3/AAAAAA8AAAD6//7/AAAAAA8AAAD5//7/AAAAAA8AAAD5////AAAAAA8AAAD5/wAAAAAAAA8AAAD5/wEAAAAAAA8AAAD5/wIAAAAAAA8AAAD6/wMAAAAAAA8AAAD7/wMAAAAAAA8AAAD8/wMAAAAAAA8AAAD9/wMAAAAAAA8AAAD+/wMAAAAAAA8AAAD//wMAAAAAAA8AAAAAAAMAAAAAAA8AAAAAAAIAAAAAAA8AAAABAAIAAAAAAA8AAAACAAIAAAAAAA8AAAACAAEAAAAAAA8AAAACAAAAAAAAAA8AAAACAP//AAAAAA8AAAACAP7/AAAAAA8AAAD///v/AAAAAA8AAAD///z/AAAAAA8AAAD9//v/AAAAAA8AAAD+//v/AAAAAA8AAAAAAPv/AAAAAA8AAAABAPv/AAAAAA8AAAACAPv/AAAAAA8AAAD6//z/AAAAAA8AAAD6//v/AAAAAA8AAAD7//v/AAAAAA8AAAD7//r/AAAAAA8AAAD7//n/AAAAAA8AAAD7//j/AAAAAA8AAAD8//j/AAAAAA8AAAD9//j/AAAAAA8AAAD+//j/AAAAAA8AAAD///j/AAAAAA8AAAAAAPj/AAAAAA8AAAABAPj/AAAAAA8AAAACAPj/AAAAAA8AAAADAPj/AAAAAA8AAAAEAPj/AAAAAA8AAAAFAPj/AAAAAA8AAAAFAPn/AAAAAA8AAAAFAPr/AAAAAA8AAAAFAPv/AAAAAA8AAAAFAPz/AAAAAA8AAAAFAP3/AAAAAA8AAAAFAP7/AAAAAA8AAAAFAP//AAAAAA8AAAAFAAAAAAAAAA8AAAAEAAAAAAAAAA8AAAADAAAAAAAAAA8AAAD8/wAAAAABAAEAAAD8/wEAAAABAAEAAAD7/wEAAAABAAEAAAD7/wIAAAABAAEAAAD7/wAAAAABAAEAAAD6/wAAAAABAAEAAAD6/wEAAAABAAEAAAD6/wIAAAABAAEAAAD7////AAABAAEAAAD6////AAABAAEAAAD8//3/AAABAAEAAAD8//z/AAABAAEAAAD8//v/AAABAAEAAAD8//r/AAABAAEAAAD8//n/AAABAAEAAAD9//n/AAABAAEAAAD9//r/AAABAAEAAAD+//r/AAABAAEAAAD+//n/AAABAAEAAAD///n/AAABAAEAAAD///r/AAABAAEAAAAAAPr/AAABAAEAAAAAAPn/AAABAAEAAAABAPn/AAABAAEAAAABAPr/AAABAAEAAAACAPr/AAABAAEAAAACAPn/AAABAAEAAAADAPn/AAABAAEAAAADAPr/AAABAAEAAAADAPv/AAABAAEAAAADAPz/AAABAAEAAAACAPz/AAABAAEAAAABAPz/AAABAAEAAAAAAPz/AAABAAEAAAAAAP3/AAABAAEAAAD///3/AAABAAEAAAD+//3/AAABAAEAAAD+//z/AAABAAEAAAD9//z/AAABAAEAAAD9//3/AAABAAEAAAD9//7/AAABAAEAAAD8//7/AAABAAEAAAD7//7/AAABAAEAAAD7//3/AAABAAEAAAD7//z/AAABAAEAAAD8////AAABAAEAAAD+//7/AAABAAEAAAAAAP7/AAABAAEAAAABAP7/AAABAAEAAAABAP3/AAABAAEAAAACAP3/AAABAAEAAAADAP3/AAABAAEAAAADAP7/AAABAAEAAAADAP//AAABAAEAAAAEAP//AAABAAEAAAAEAP7/AAABAAEAAAAEAP3/AAABAAEAAAAEAPz/AAABAAEAAAAEAPv/AAABAAEAAAAEAPr/AAABAAEAAAAEAPn/AAABAAEAAAD9/wIAAAABAAEAAAD9/wEAAAABAAEAAAD8/wIAAAABAAEAAAD+/wIAAAABAAEAAAD//wIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAAABAAEAAAAAAAEAAAABAAEAAAD6/wkAAAAEAAQAAAD7/wkAAAAEAAQAAAD8/wkAAAAEAAQAAAD8/wgAAAAEAAQAAAD9/wgAAAAEAAQAAAD+/wgAAAAEAAQAAAD+/wcAAAAEAAQAAAAGAAYAAAAPAAAAAAAFAAcAAAAPAAAAAAAFAAgAAAAPAAAAAAAGAAgAAAAPAAAAAAAGAAkAAAAPAAAAAAAHAAkAAAAPAAAAAAAHAAgAAAAPAAAAAAAIAAgAAAAPAAAAAAAJAAcAAAAPAAAAAAAJAAYAAAAPAAAAAAAIAAYAAAAPAAAAAAAIAAUAAAAPAAAAAAAHAAUAAAAPAAAAAAAHAAYAAAAPAAAAAAAHAAcAAAAPAAAAAAAGAAcAAAAPAAAAAAADAAYAAAAOAAEAAAADAAcAAAAOAAEAAAACAAcAAAAOAAEAAAACAAYAAAAOAAEAAAABAAoAAAAKAAQAAAABAAsAAAAKAAQAAAABAAwAAAAKAAQAAAACAAwAAAAKAAQAAAADAAwAAAAKAAQAAAADAAsAAAAKAAQAAAADAAoAAAAKAAQAAAACAAoAAAAKAAQAAAACAAkAAAAKAAQAAAABAAkAAAAKAAQAAAAAAAoAAAAKAAQAAAAAAAsAAAAKAAQAAAA=")
 tile_set = ExtResource("1_wtcfe")
 

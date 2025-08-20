@@ -3,147 +3,146 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot;
+using IntoTheRabbitHole.TileObjects;
 
 namespace IntoTheRabbitHole.Tiles;
 
-public partial class TileManager : Node
+public partial class World : Node
 {
-	public static TileManager Instance;
-	[Export] private LevelGenerator _levelGenerator;
-	private TileMapLayer _tileMap;
-	private TileMapLayer _occlusionLayer;
-	private Tile[,] _tiles;
+	public static World Instance;
+
+	private readonly List<TileObject> globalList = new();
+	private readonly List<Action> nextTickActions = new();
+
+	private readonly List<Action> postTickActions = new();
+
+	private float camraRotation;
 	public int CurrentLevel = 1;
-	private int MapSize;
-
-	private float _camraRotation;
-	
-	private readonly List<TileObjects.TileObject> _globalList = new();
-
-	private readonly List<Action> _postTickActions = new();
-	private readonly List<Action> _nextTickActions = new();
+	private LevelGenerator levelGenerator;
+	private int mapSize;
+	private TileMapLayer occlusionLayer;
 
 
-	private bool _playeMoveCompleteFlag;
-	private bool _playerMoveing;
+	private bool playeMoveCompleteFlag;
+	private bool playerMoveing;
 
-	private bool _tickInProgress;
-	private double _timeTillNextTick = 1;
+	private bool tickInProgress;
+	private TileMapLayer tileMap;
+	private Tile[,] tiles;
 
 	public double TimeTillePlayerKill = 100f;
+	private double timeTillNextTick = 1;
+	private TileMapLayer wallTileMap;
 
 	public override void _Ready()
 	{
 		Instance = this;
-		_tileMap = GetNode<TileMapLayer>("GroundLayer");
-		MapSize = Database.GetLevel(CurrentLevel).MapSize;
-		_levelGenerator.MapSize = MapSize;
-		
-		if (_tileMap == null)
+		tileMap = GetNode<TileMapLayer>("GroundLayer"); //do we need this?
+		wallTileMap = GetNode<TileMapLayer>("WallLayer");
+		levelGenerator = GetNode<LevelGenerator>("LevelGenerator");
+
+		mapSize = Database.GetLevel(CurrentLevel).MapSize;
+		levelGenerator.MapSize = mapSize;
+
+		if (tileMap == null)
 		{
 			GD.PrintErr("TileMapLayer node not found in TileManager.");
 			return;
 		}
 
+
 		// Initialize or load tiles here if needed
-		_tiles = new Tile[MapSize, MapSize];
+		tiles = new Tile[mapSize, mapSize];
 
 		// Populate the tile array with Tile objects
-		for (int x = 0; x < _tiles.GetLength(0); x++)
-		for (int y = 0; y < _tiles.GetLength(1); y++)
-			_tiles[x, y] = new Tile(x - (MapSize/2), y - (MapSize/2), this); // Adjusting for center origin
-		
-		_levelGenerator.Initialize();
-		_levelGenerator.GenerateLevel();
+		for (int x = 0; x < tiles.GetLength(0); x++)
+		for (int y = 0; y < tiles.GetLength(1); y++)
+			tiles[x, y] = new Tile(x - mapSize / 2, y - mapSize / 2, this); // Adjusting for center origin
 
+
+		var p = new Player(GetTile(0, 0));
+		Move(p, GetTile(0, 0));
+		levelGenerator.Initialize();
+		levelGenerator.GenerateLevel(ref wallTileMap);
 	}
 
-	private List<TileObjects.TileObject> GetGlobalList()
+	private List<TileObject> GetGlobalList()
 	{
-		_globalList.Clear();
+		globalList.Clear();
 		//we collect all objects and update them, "updating tiles" will cause moving objects to get ticked more than once
-		foreach (var t in _tiles) _globalList.AddRange(t.TileObjects);
-		return _globalList;
+		foreach (var t in tiles) globalList.AddRange(t.TileObjects);
+		return globalList;
 	}
 
 	public void DoNextTick(Action t)
 	{
-		_nextTickActions.Add(t);
+		nextTickActions.Add(t);
 	}
 
 	public void DoAfterThisTick(Action t)
 	{
-		if (!_tickInProgress)
+		if (!tickInProgress)
 		{
 			t.Invoke(); //if we are not in a tick, we can just invoke the action
 			return;
 		}
 
-		_postTickActions.Add(t);
+		postTickActions.Add(t);
 	}
 
 	public override void _Process(double delta)
 	{
-		if (!_playerMoveing)
+		if (!playerMoveing)
 		{
-			_timeTillNextTick -= delta;
+			timeTillNextTick -= delta;
 			TimeTillePlayerKill -= delta;
 		}
-			
-		if (_timeTillNextTick <= 0)
+
+		if (timeTillNextTick <= 0)
 		{
-			_tickInProgress = true;
+			tickInProgress = true;
 			Tick();
-			_tickInProgress = false;
-			_timeTillNextTick = 1f;
+			tickInProgress = false;
+			timeTillNextTick = 1f;
 		}
 
-		if (TimeTillePlayerKill <= 0)
-		{
-			Player.Instance.Kill();
-		}
-		
-		
+		if (TimeTillePlayerKill <= 0) Player.Instance.Kill();
+
+
 		base._Process(delta);
 	}
 
 	private void Tick()
 	{
-		foreach (var act in _nextTickActions) act.Invoke();
-		_nextTickActions.Clear();
+		foreach (var act in nextTickActions) act.Invoke();
+		nextTickActions.Clear();
 		foreach (var o in GetGlobalList()) o.Tick();
-		foreach (var act in _postTickActions) act.Invoke();
-		_postTickActions.Clear();
+		foreach (var act in postTickActions) act.Invoke();
+		postTickActions.Clear();
 	}
 
 
-	private Tile GetTile(int x, int y)
-	{
-		return GetTile(new Vector2I(x, y));
-	}
+	private Tile GetTile(int x, int y) => GetTile(new Vector2I(x, y));
 
 	public Tile GetTile(Vector2I position)
 	{
 		//convert from tilemap coordinates to array coordinates
-		int x = position.X + (MapSize/2); // Assuming the tilemap is centered at (0,0)
-		int y = position.Y + (MapSize/2); // Adjust based on your tilemap's origin
+		int x = position.X + mapSize / 2; // Assuming the tilemap is centered at (0,0)
+		int y = position.Y + mapSize / 2; // Adjust based on your tilemap's origin
 
-		if (x < 0 || x >= _tiles.GetLength(0) || y < 0 || y >= _tiles.GetLength(1))
+		if (x < 0 || x >= tiles.GetLength(0) || y < 0 || y >= tiles.GetLength(1))
 		{
 			GD.PrintErr("Tile position out of bounds: " + position);
 			return null;
 		}
 
-		return _tiles[x, y];
+		return tiles[x, y];
 	}
 
 
-	public Vector2 MapToLocal(Vector2I playerTilePosition)
-	{
-		return _tileMap.MapToLocal(playerTilePosition);
-	}
+	public Vector2 MapToLocal(Vector2I playerTilePosition) => tileMap.MapToLocal(playerTilePosition);
 
-	public void Move(TileObjects.TileObject o, Vector2I pos, bool tempFloat = false)
+	public void Move(TileObject o, Vector2I pos, bool tempFloat = false)
 	{
 		var targetTile = GetTile(pos);
 		if (targetTile == null)
@@ -155,20 +154,20 @@ public partial class TileManager : Node
 		Move(o, targetTile, tempFloat);
 	}
 
-	private void Move(TileObjects.TileObject o, Tile target, bool tempFloat = false)
+	private void Move(TileObject o, Tile target, bool tempFloat = false)
 	{
 		if (o.ParentTile != null) o.ParentTile.TileObjects.Remove(o);
 		target.Place(o, tempFloat);
 
 		//this is a bit of sphagetti, hopefully eventually it will be smoothed out
-		if (_playerMoveing)
+		if (playerMoveing)
 		{
 			GD.Print(o.TilePostion + " player move");
-			_playeMoveCompleteFlag = true;
+			playeMoveCompleteFlag = true;
 		}
 	}
 
-	public void PlayerMove(TileObjects.TileObject o, Vector2I dir)
+	public void PlayerMove(TileObject o, Vector2I dir)
 	{
 		//sanity check
 		if (o.GetType() != typeof(Player))
@@ -176,13 +175,14 @@ public partial class TileManager : Node
 			GD.PrintErr("PlayerMove called on non-player object: " + o.GetType());
 			return;
 		}
-		if(_playerMoveing) return;
+
+		if (playerMoveing) return;
 
 		var player = (Player) o;
 		//do this in a separate thread to avoid blocking the main thread
 		Task.Run(() =>
 		{
-			_playerMoveing = true; //pause the simulation
+			playerMoveing = true; //pause the simulation
 
 			// Animation parameters
 			float animationDuration = 0.5f; // Half second animation
@@ -202,14 +202,14 @@ public partial class TileManager : Node
 				if (t >= 0.5f && !movedToJumpTile)
 				{
 					// Use a flag to track when move is complete
-					_playeMoveCompleteFlag = false;
+					playeMoveCompleteFlag = false;
 
 					CallDeferred(MethodName.Move, player, player.TilePostion + dir, true);
 
 					//TODO STEP BY STEP TRAIT ACTIVIATION DISPLAY
 					Thread.Sleep(150);
 
-					while (!_playeMoveCompleteFlag)
+					while (!playeMoveCompleteFlag)
 						// Wait until move is processed
 						Thread.Sleep(16);
 					movedToJumpTile = true;
@@ -235,22 +235,26 @@ public partial class TileManager : Node
 				Thread.Sleep(16); // 16ms delay
 			}
 
-			_playeMoveCompleteFlag = false;
+			playeMoveCompleteFlag = false;
 			// Actually move the player in the tile system
 			CallDeferred(MethodName.Move, player, player.TilePostion + dir, false);
 			//TODO STEP BY STEP TRAIT ACTIVIATION DISPLAY
-			while (!_playeMoveCompleteFlag)
+			while (!playeMoveCompleteFlag)
 				// Wait until move is processed
 				Thread.Sleep(16);
 
-			_playerMoveing = false;
+			playerMoveing = false;
+
+			//print tilemap position
+			var tileData = wallTileMap.GetCellTileData(player.TilePostion);
+			if (tileData != null) GD.Print($"Player moved to: {player.TilePostion} with data: {tileData.GetCustomData("solid")}");
 		});
 	}
 
 
 	public void UpdateCameraPosition(float camRotation)
 	{
-		_camraRotation = camRotation;
+		camraRotation = camRotation;
 		foreach (var obj in GetGlobalList()) obj.UpdateCameraPosition(camRotation);
 	}
 }

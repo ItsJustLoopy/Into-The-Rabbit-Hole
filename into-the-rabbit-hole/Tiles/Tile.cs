@@ -1,45 +1,42 @@
 using System.Collections.Generic;
 using Godot;
+using IntoTheRabbitHole.TileObjects;
 using IntoTheRabbitHole.Traits;
 
 namespace IntoTheRabbitHole.Tiles;
 
 public class Tile
 {
-	public readonly TileManager TileManager;
-	private GroundType? _groundType;
+	private readonly List<TileObject> safeList = new();
+	public readonly World World;
+	private GroundType? groundType;
+	public List<TileObject> TileObjects = new();
+	public Vector2I TilePosition;
+
+	public Tile(int x, int y, World tmanager)
+	{
+		TilePosition = new Vector2I(x, y);
+		World = tmanager;
+	}
 
 	public GroundType? GroundType
 	{
-		get => _groundType;
+		get => groundType;
 		set
 		{
-			if (_groundType != null)
-			{
-				_groundType.QueueFree(); // Remove from scene tree
-			}
+			if (groundType != null) groundType.QueueFree(); // Remove from scene tree
 
-			_groundType = value;
-			if (_groundType != null)
+			groundType = value;
+			if (groundType != null)
 			{
-				_groundType.Position = TileManager.MapToLocal(TilePosition);
-				TileManager.AddChild(_groundType);
+				groundType.Position = World.MapToLocal(TilePosition);
+				World.AddChild(groundType);
 			}
 		}
 	}
 
-	private readonly List<TileObjects.TileObject> _safeList = new();
-	public List<TileObjects.TileObject> TileObjects = new();
-	public Vector2I TilePosition;
-
-	public Tile(int x, int y, TileManager tmanager)
-	{
-		TilePosition = new Vector2I(x, y);
-		TileManager = tmanager;
-	}
-
 	//floating bool is a special case for the player jumping over
-	public void Place(TileObjects.TileObject tileObject, bool floating = false)
+	public void Place(TileObject tileObject, bool floating = false)
 	{
 		var fromDir = tileObject.TilePostion - TilePosition;
 		//normalise into simple directions
@@ -49,7 +46,7 @@ public class Tile
 			fromDir.Y = fromDir.Y > 0 ? 1 : -1;
 
 		tileObject.ParentTile = this;
-		tileObject.GlobalPosition = TileManager.MapToLocal(TilePosition);
+		tileObject.GlobalPosition = World.MapToLocal(TilePosition);
 
 		if (floating || tileObject.HasTrait<Float>())
 			FloatedOn(tileObject, fromDir);
@@ -60,14 +57,14 @@ public class Tile
 		TileObjects.Add(tileObject);
 	}
 
-	private List<TileObjects.TileObject> GetSafeList()
+	private List<TileObject> GetSafeList()
 	{
-		_safeList.Clear();
-		_safeList.AddRange(TileObjects);
-		return _safeList;
+		safeList.Clear();
+		safeList.AddRange(TileObjects);
+		return safeList;
 	}
 
-	private void FloatedOn(TileObjects.TileObject tileObject, Vector2I fromDir)
+	private void FloatedOn(TileObject tileObject, Vector2I fromDir)
 	{
 		foreach (var to in GetSafeList())
 		{
@@ -79,7 +76,7 @@ public class Tile
 	}
 
 
-	public void SteppedOn(TileObjects.TileObject o, Vector2I fromDir)
+	public void SteppedOn(TileObject o, Vector2I fromDir)
 	{
 		foreach (var to in GetSafeList())
 		{

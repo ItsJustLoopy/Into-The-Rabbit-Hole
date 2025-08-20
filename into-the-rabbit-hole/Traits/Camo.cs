@@ -1,15 +1,13 @@
 using Godot;
+using IntoTheRabbitHole.TileObjects;
 
 namespace IntoTheRabbitHole.Traits;
 
 public class Camo : Trait
 {
-	private readonly Sprite2D _ownerSprite;
+	private readonly Sprite2D ownerSprite;
 
-	public Camo(TileObjects.TileObject o) : base(o)
-	{
-		_ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
-	}
+	public Camo(TileObject o) : base(o) => ownerSprite = o.GetNode<Sprite2D>("Sprite2D");
 
 
 	public override ushort ExecutionPriority => 5;
@@ -22,6 +20,6 @@ public class Camo : Trait
 
 		float offset = (float) Mathf.Abs(Mathf.Sin(Time.GetTicksMsec() * 0.001) * 0.9f);
 
-		_ownerSprite.Modulate = new Color(1, 1, 1, Mathf.Pow(offset, 4)); // Adjust alpha based on position offset
+		ownerSprite.Modulate = new Color(1, 1, 1, Mathf.Pow(offset, 4)); // Adjust alpha based on position offset
 	}
 }

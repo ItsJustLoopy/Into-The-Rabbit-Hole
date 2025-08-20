@@ -1,12 +1,11 @@
-﻿using IntoTheRabbitHole.Tiles;
+﻿using IntoTheRabbitHole.TileObjects;
+using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole.Traits;
 
 public class Attack : Trait
 {
-	public Attack(TileObjects.TileObject o) : base(o)
-	{
-	}
+	public Attack(TileObject o) : base(o) { }
 
 	public override ushort ExecutionPriority => 10;
 

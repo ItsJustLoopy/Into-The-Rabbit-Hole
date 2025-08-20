@@ -1,14 +1,13 @@
 ﻿using System;
 using Godot;
+using IntoTheRabbitHole.TileObjects;
 using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole.Traits;
 
 public class FollowPlayer : Trait
 {
-	public FollowPlayer(TileObjects.TileObject o) : base(o)
-	{
-	}
+	public FollowPlayer(TileObject o) : base(o) { }
 
 	public override ushort ExecutionPriority => 1;
 
@@ -31,6 +30,6 @@ public class FollowPlayer : Trait
 		GD.Print(direction.ToString());
 
 		var postToMove = Owner.TilePostion + direction;
-		TileManager.Instance.Move(Owner, postToMove);
+		World.Instance.Move(Owner, postToMove);
 	}
 }

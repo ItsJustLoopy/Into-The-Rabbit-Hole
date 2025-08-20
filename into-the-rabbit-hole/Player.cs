@@ -1,24 +1,25 @@
 using System;
 using Godot;
+using IntoTheRabbitHole.TileObjects;
 using IntoTheRabbitHole.Tiles;
 
 namespace IntoTheRabbitHole;
 
-public partial class Player : TileObjects.TileObject
+public partial class Player : TileObject
 {
 	public static Player Instance;
-	private Camera2D _cam;
-	private float _camLerpSpeed = 10f; // Speed of camera rotation lerp
-	private float _currentRotation; // Track player's current rotation in radians
+	private Camera2D cam;
+	private float camLerpSpeed = 10f; // Speed of camera rotation lerp
+	private float currentRotation; // Track player's current rotation in radians
 
 	public Player(Tile parentTil) : base(parentTil, "Player")
 	{
 		Instance = this;
-		_cam = new Camera2D();
-		_cam.IgnoreRotation = false;
-		_cam.Zoom = new Vector2(3, 3); 
-		
-		AddChild(_cam);
+		cam = new Camera2D();
+		cam.IgnoreRotation = false;
+		cam.Zoom = new Vector2(3, 3);
+
+		AddChild(cam);
 	}
 
 	public int Score { get; set; }
@@ -40,9 +41,9 @@ public partial class Player : TileObjects.TileObject
 
 	private void RotatePlayer(float rotationDelta)
 	{
-		_currentRotation += rotationDelta;
+		currentRotation += rotationDelta;
 		// Normalize rotation to keep it between 0 and 2π
-		_currentRotation = Mathf.Wrap(_currentRotation, 0, Mathf.Pi * 2);
+		currentRotation = Mathf.Wrap(currentRotation, 0, Mathf.Pi * 2);
 	}
 
 	private void MoveForward()
@@ -61,7 +62,7 @@ public partial class Player : TileObjects.TileObject
 	{
 		// Convert rotation to grid direction (up, down, left, right)
 		// Normalize rotation to nearest 90-degree increment
-		float normalizedRotation = Mathf.Round(_currentRotation / (Mathf.Pi / 2)) * (Mathf.Pi / 2);
+		float normalizedRotation = Mathf.Round(currentRotation / (Mathf.Pi / 2)) * (Mathf.Pi / 2);
 
 		// Calculate direction vector based on rotation
 		var directionFloat = Vector2.Up.Rotated(normalizedRotation);
@@ -72,10 +73,10 @@ public partial class Player : TileObjects.TileObject
 
 	private void UpdateCameraRotation(double delta)
 	{
-		float target = _currentRotation;
-		float lerped = (float) Mathf.LerpAngle(_cam.Rotation, target, delta * _camLerpSpeed);
-		_cam.Rotation = lerped;
-		TileManager.Instance.UpdateCameraPosition(_cam.Rotation);
+		float target = currentRotation;
+		float lerped = (float) Mathf.LerpAngle(cam.Rotation, target, delta * camLerpSpeed);
+		cam.Rotation = lerped;
+		World.Instance.UpdateCameraPosition(cam.Rotation);
 	}
 
 	public void Move(Vector2I direction)
@@ -86,6 +87,6 @@ public partial class Player : TileObjects.TileObject
 		if (Math.Abs(direction.X) + Math.Abs(direction.Y) > 1)
 			return;
 
-		TileManager.Instance.PlayerMove(this, direction);
+		World.Instance.PlayerMove(this, direction);
 	}
 }
