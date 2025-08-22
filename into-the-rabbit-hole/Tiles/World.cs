@@ -21,10 +21,7 @@ public partial class World : Node
 	private LevelGenerator levelGenerator;
 	private int mapSize;
 	private TileMapLayer occlusionLayer;
-
-
-	private bool playeMoveCompleteFlag;
-	private bool playerMoveing;
+	
 
 	private bool tickInProgress;
 	private TileMapLayer tileMap;
@@ -33,6 +30,8 @@ public partial class World : Node
 	public double TimeTillePlayerKill = 100f;
 	private double timeTillNextTick = 1;
 	private TileMapLayer wallTileMap;
+
+	private const float TimePerTick = 0.2f;
 
 	public override void _Ready()
 	{
@@ -92,18 +91,18 @@ public partial class World : Node
 
 	public override void _Process(double delta)
 	{
-		if (!playerMoveing)
-		{
+		//if (!playerMoveing)
+		//{
 			timeTillNextTick -= delta;
 			TimeTillePlayerKill -= delta;
-		}
+		//}
 
 		if (timeTillNextTick <= 0)
 		{
 			tickInProgress = true;
 			Tick();
 			tickInProgress = false;
-			timeTillNextTick = 1f;
+			timeTillNextTick = TimePerTick;
 		}
 
 		if (TimeTillePlayerKill <= 0) Player.Instance.Kill();
@@ -112,10 +111,16 @@ public partial class World : Node
 		base._Process(delta);
 	}
 
+	List<Action> thisTickActions = new();
 	private void Tick()
 	{
-		foreach (var act in nextTickActions) act.Invoke();
-		nextTickActions.Clear();
+		thisTickActions.AddRange(nextTickActions);//this weird stuf is cause of concurrecny issues, we need to copy the list to avoid modifying it while iterating
+		foreach (var act in thisTickActions)
+		{
+			nextTickActions.Remove(act);
+			act.Invoke();
+		}
+		thisTickActions.Clear();
 		foreach (var o in GetGlobalList()) o.Tick();
 		foreach (var act in postTickActions) act.Invoke();
 		postTickActions.Clear();
@@ -141,115 +146,96 @@ public partial class World : Node
 
 
 	public Vector2 MapToLocal(Vector2I playerTilePosition) => tileMap.MapToLocal(playerTilePosition);
+	
+	public void StartJump(TileObject o, Vector2I dir, int distance = 2)
+	{
+		if (o.Moving)
+		{
+			return;
+		}
+		GD.Print("StartJump called with direction: " + dir + " and distance: " + distance);
+		o.Moving = true;
+		DoNextTick(delegate { JumpToTile(o, dir, distance); });
+	}
 
-	public void Move(TileObject o, Vector2I pos, bool tempFloat = false)
+	public void JumpToTile(TileObject o, Vector2I dir, int distance)
+	{
+		GD.Print("JumpToTile called with direction: " + dir + " and distance: " + distance);
+		//make sure dir its a normalized direction
+		if (dir.X != 0)
+			dir.X = dir.X > 0 ? 1 : -1;
+		if (dir.Y != 0)
+			dir.Y = dir.Y > 0 ? 1 : -1;
+		//no diagonal jumps
+		if (Math.Abs(dir.X) + Math.Abs(dir.Y) != 1)
+		{
+			GD.PrintErr("JumpToTile called with invalid direction: " + dir);
+			return;
+		}
+		
+
+		//move 1 distance in the given direction
+		bool tempFloat = distance > 1; //no float on last jump
+		bool res = Move(o, o.TilePostion + dir, tempFloat);
+		GD.Print("Moved to: " + (o.TilePostion + dir) + " with result: " + res);
+		if (res)
+		{
+			if (distance > 1)
+			{
+				GD.Print("Quued Jumped to tile: " + o.TilePostion + " in direction: " + dir + " with distance: " + distance);
+				//we moved successfully, so we can jump to the next tile
+				DoNextTick(delegate { JumpToTile(o, dir, distance - 1); });
+
+			}
+			else
+			{
+				GD.Print("done moving");
+				o.Moving = false; //stop moving if we reached the last tile
+			}
+		}
+		else
+		{
+			GD.Print("hit wall");
+			//stop floating if we can't move
+			Move(o, o.TilePostion, false);
+			o.Moving = false;
+		}
+
+
+
+	}
+
+	public bool Move(TileObject o, Vector2I pos, bool tempFloat = false)
 	{
 		var targetTile = GetTile(pos);
 		if (targetTile == null)
 		{
 			GD.PrintErr("Target tile not found for position: " + pos);
-			return;
+			return false;
 		}
 
-		Move(o, targetTile, tempFloat);
+		return Move(o, targetTile, tempFloat);
 	}
 
-	private void Move(TileObject o, Tile target, bool tempFloat = false)
+	public bool Move(TileObject o, Tile target, bool tempFloat = false)
 	{
 		if (o.ParentTile != null) o.ParentTile.TileObjects.Remove(o);
-		target.Place(o, tempFloat);
-
-		//this is a bit of sphagetti, hopefully eventually it will be smoothed out
-		if (playerMoveing)
+		
+		var tileData = wallTileMap.GetCellTileData(target.TilePosition);
+		if (tileData != null)
 		{
-			GD.Print(o.TilePostion + " player move");
-			playeMoveCompleteFlag = true;
-		}
-	}
-
-	public void PlayerMove(TileObject o, Vector2I dir)
-	{
-		//sanity check
-		if (o.GetType() != typeof(Player))
-		{
-			GD.PrintErr("PlayerMove called on non-player object: " + o.GetType());
-			return;
-		}
-
-		if (playerMoveing) return;
-
-		var player = (Player) o;
-		//do this in a separate thread to avoid blocking the main thread
-		Task.Run(() =>
-		{
-			playerMoveing = true; //pause the simulation
-
-			// Animation parameters
-			float animationDuration = 0.5f; // Half second animation
-			float elapsedTime = 0f;
-			var startPosition = MapToLocal(player.TilePostion);
-			var jumpTilePos = MapToLocal(player.TilePostion + dir);
-			var endPosition = MapToLocal(player.TilePostion + dir * 2);
-
-			bool movedToJumpTile = false;
-
-			// Animation loop
-			while (elapsedTime < animationDuration)
+			if ((bool) tileData.GetCustomData("solid"))//can't move into solids
 			{
-				float t = elapsedTime / animationDuration;
-
-				// Pause at midpoint for evaluation
-				if (t >= 0.5f && !movedToJumpTile)
-				{
-					// Use a flag to track when move is complete
-					playeMoveCompleteFlag = false;
-
-					CallDeferred(MethodName.Move, player, player.TilePostion + dir, true);
-
-					//TODO STEP BY STEP TRAIT ACTIVIATION DISPLAY
-					Thread.Sleep(150);
-
-					while (!playeMoveCompleteFlag)
-						// Wait until move is processed
-						Thread.Sleep(16);
-					movedToJumpTile = true;
-				}
-
-				// 3-point bezier curve: start -> jump tile -> move tile
-
-				var p0 = startPosition;
-				var p1 = jumpTilePos;
-				var p2 = endPosition;
-
-				// Quadratic bezier interpolation
-				var currentPos = p0 * (1 - t) * (1 - t) + p1 * 2 * (1 - t) * t + p2 * t * t;
-
-				// Scale effect - player gets bigger during jump
-				float scaleMultiplier = 1.0f + Mathf.Sin(t * Mathf.Pi) * 0.3f;
-
-				// Update position and scale
-				player.CallDeferred(Node2D.MethodName.SetPosition, currentPos);
-				player.CallDeferred(Node2D.MethodName.SetScale, Vector2.One * scaleMultiplier);
-
-				elapsedTime += 0.016f; // ~60 FPS
-				Thread.Sleep(16); // 16ms delay
+				return false;
 			}
+		}
+		
+		target.Place(o, tempFloat);
+		o.TempFloating = tempFloat;
 
-			playeMoveCompleteFlag = false;
-			// Actually move the player in the tile system
-			CallDeferred(MethodName.Move, player, player.TilePostion + dir, false);
-			//TODO STEP BY STEP TRAIT ACTIVIATION DISPLAY
-			while (!playeMoveCompleteFlag)
-				// Wait until move is processed
-				Thread.Sleep(16);
-
-			playerMoveing = false;
-
-			//print tilemap position
-			var tileData = wallTileMap.GetCellTileData(player.TilePostion);
-			if (tileData != null) GD.Print($"Player moved to: {player.TilePostion} with data: {tileData.GetCustomData("solid")}");
-		});
+		return true;
 	}
+
 
 
 	public void UpdateCameraPosition(float camRotation)

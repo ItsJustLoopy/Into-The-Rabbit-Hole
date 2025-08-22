@@ -46,8 +46,6 @@ public class Tile
 			fromDir.Y = fromDir.Y > 0 ? 1 : -1;
 
 		tileObject.ParentTile = this;
-		tileObject.GlobalPosition = World.MapToLocal(TilePosition);
-
 		if (floating || tileObject.HasTrait<Float>())
 			FloatedOn(tileObject, fromDir);
 		else

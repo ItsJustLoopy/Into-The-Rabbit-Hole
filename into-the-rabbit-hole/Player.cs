@@ -87,6 +87,6 @@ public partial class Player : TileObject
 		if (Math.Abs(direction.X) + Math.Abs(direction.Y) > 1)
 			return;
 
-		World.Instance.PlayerMove(this, direction);
+		World.Instance.StartJump(this, direction,2);
 	}
 }

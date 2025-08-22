@@ -9,10 +9,13 @@ namespace IntoTheRabbitHole.TileObjects;
 public partial class TileObject : Node2D
 {
 	private readonly List<Trait> traits = new();
+
 	public Tile ParentTile;
 	public bool Solid = false;
 	private Sprite2D sprite = new();
 	public string Type;
+	
+	private Vector2 TargetDisplayPosition = new Vector2();
 
 	public TileObject(Tile parentTile, string type)
 	{
@@ -35,16 +38,41 @@ public partial class TileObject : Node2D
 
 		World.Instance.AddChild(this);
 		ParentTile.Place(this);
+		TargetDisplayPosition = RealPosition;
 	}
 
 	public Vector2I TilePostion => ParentTile.TilePosition; // mfw I try to access "TilePosition" and it doesn't exist because of a spelling error
+	public Vector2 RealPosition => ParentTile.World.MapToLocal(TilePostion);
+	public bool Moving { get; set; }
+	public bool TempFloating { get; set; }
 
 
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
+
+		TargetDisplayPosition = RealPosition;
+		//move position towards target display position exponentially
+		var diff = TargetDisplayPosition - Position;
+		if (diff.Length() > 0.1f)
+			Position += diff * (float) (10 * delta);
+		else
+			Position = TargetDisplayPosition;
+		
+		//increase scale if floating
+		var targetScale = TempFloating ? 1.2f : 1f;
+		if (Math.Abs(Scale.X - targetScale) > 0.01f)
+			Scale = new Vector2(Scale.X + (targetScale - Scale.X) * (float) (10 * delta),
+				Scale.Y + (targetScale - Scale.Y) * (float) (10 * delta));
+		else
+			Scale = new Vector2(targetScale, targetScale);
+		
+		
+		
+
 		foreach (var t in traits) t.ModifyAppearance(delta);
 	}
+
 
 	public bool HasTrait<T>() where T : Trait
 	{
@@ -102,4 +130,7 @@ public partial class TileObject : Node2D
 	}
 
 	public Sprite2D GetSprite() => sprite;
+
+
+	
 }
