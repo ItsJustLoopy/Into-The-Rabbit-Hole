@@ -22,7 +22,7 @@ public partial class LevelGenerator : Node
 	private Database.TerrainConfig terrainConfig;
 
 	// Terrain stuff
-
+	private bool[,] terrainMap;
 	[Export] public int WallSource, TerrainSetId;
 
 	public int Seed
@@ -37,6 +37,7 @@ public partial class LevelGenerator : Node
 		seed = new Random().Next(); // TODO allow input for seeded runs
 		noise = noiseTexture.Noise as FastNoiseLite;
 		random = new Random(seed);
+		terrainMap = new bool[MapSize, MapSize];
 
 		noise.Seed = seed;
 
@@ -73,7 +74,6 @@ public partial class LevelGenerator : Node
 	private void GenerateBaseTerrain(ref TileMapLayer wallTileMap)
 	{
 		// Terrain determinant
-		bool[,] terrainMap = new bool[MapSize, MapSize];
 		for (int x = 0; x < MapSize; x++)
 		for (int y = 0; y < MapSize; y++)
 		{
@@ -90,8 +90,7 @@ public partial class LevelGenerator : Node
 		{
 			var tile = GetTileManagerTileAt(x, y);
 
-			//i assume ground should be a tilemap but i wont delete GroundType for now in case you have other plans
-			//tile.GroundType = new GroundType(tile, terrainConfig.MainGround);
+			tile.GroundType = new GroundType(tile, terrainConfig.MainGround);
 
 			// Place walls where theres a false
 			if (!terrainMap[x, y])
@@ -245,6 +244,12 @@ public partial class LevelGenerator : Node
 			GD.Print($"Cannot place object: Tile already has objects at {tile.TilePosition}");
 			return false;
 		}
+		
+		var tileRealPos = tile.TilePosition + new Vector2I(MapSize / 2, MapSize / 2);
+		if (terrainMap[tileRealPos.X, tileRealPos.Y] == false)
+		{
+			return false;
+		}
 
 		return true;
 	}
@@ -256,7 +261,8 @@ public partial class LevelGenerator : Node
 
 		if (CanPlaceObjectAt(playerSpawnTile))
 		{
-			Player.Instance.SetPosition(playerSpawnTile.TilePosition); //we should not be deleting and respawning the player, but just moving them
+			Player.Instance.SetPosition(playerSpawnTile.TilePosition); 
+			Player.Instance.sprite.ZIndex = 1;
 			GD.Print($"Player placed at tile: {playerSpawnTile.TilePosition}");
 		}
 		else

@@ -12,7 +12,7 @@ public partial class TileObject : Node2D
 
 	public Tile ParentTile;
 	public bool Solid = false;
-	private Sprite2D sprite = new();
+	public Sprite2D sprite = new();
 	public string Type;
 	
 	private Vector2 TargetDisplayPosition = new Vector2();

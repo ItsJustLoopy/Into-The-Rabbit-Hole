@@ -36,19 +36,12 @@ public partial class World : Node
 	public override void _Ready()
 	{
 		Instance = this;
-		tileMap = GetNode<TileMapLayer>("GroundLayer"); //do we need this?
 		wallTileMap = GetNode<TileMapLayer>("WallLayer");
 		levelGenerator = GetNode<LevelGenerator>("LevelGenerator");
 
 		mapSize = Database.GetLevel(CurrentLevel).MapSize;
 		levelGenerator.MapSize = mapSize;
-
-		if (tileMap == null)
-		{
-			GD.PrintErr("TileMapLayer node not found in TileManager.");
-			return;
-		}
-
+		
 
 		// Initialize or load tiles here if needed
 		tiles = new Tile[mapSize, mapSize];
@@ -145,7 +138,7 @@ public partial class World : Node
 	}
 
 
-	public Vector2 MapToLocal(Vector2I playerTilePosition) => tileMap.MapToLocal(playerTilePosition);
+	public Vector2 MapToLocal(Vector2I playerTilePosition) => wallTileMap.MapToLocal(playerTilePosition);
 	
 	public void StartJump(TileObject o, Vector2I dir, int distance = 2)
 	{
